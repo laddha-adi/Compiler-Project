@@ -4,8 +4,11 @@ This is a compiler written in C for course CSF363 - Compiler construction and De
 All team members are requested to strictly follow the timeline give below : 
 
 Understanding language features              February 12
+
 Constructing hand drawn DFA for lexer      February 14
+
 Understanding Grammar                            February 16
+
 Lexical Analysis Module Development       February 18
 Testing of lexer with given test cases         February 20
 Grammar Modifications                              February 21
