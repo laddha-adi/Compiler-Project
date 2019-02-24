@@ -1,7 +1,7 @@
 # Compiler-Project
 ### This is a compiler written in C for course CSF363 - Compiler construction and Designing at BITS Pilani
 
-#### All team members are requested to strictly follow the timeline give below : 
+#### All team members are requested to strictly follow the timeline given below : 
 
   - Understanding language features              February 12
   - Constructing hand drawn DFA for lexer      February 14
