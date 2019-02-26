@@ -1,6 +1,6 @@
 # Compiler-Project
 ### This is a compiler written in C for course CSF363 - Compiler construction and Designing at BITS Pilani
-
+## Please add your code only through pull requests and merge it only after everyone has reviewed. This will help others understand the code as well.  
 #### All team members are requested to strictly follow the timeline given below : 
 
   - Understanding language features              February 12
