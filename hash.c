@@ -1,4 +1,4 @@
-#include "code.h"
+#include "hash.h"
 
 element* createHashTable(){
 	element* ht = (element*)malloc(sizeof(element)*100);
