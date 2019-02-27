@@ -10,38 +10,50 @@ int hashcode(char* string){
 
 hashtable* createHashTable(){
 	hashtable* ht = (hashtable*)malloc(sizeof(hashtable)*501);
-	for(int i = 0; i < 501; i++){
+	//printf("Here6");
+	int i;
+	for(i = 0; i < 501; i++){
+		ht[i]=(hashtable)malloc(sizeof(struct listForHash));
 		ht[i]->head=NULL;
 	}
+	if(ht==NULL) printf("LOL Sahil!!");
+	//	printf("Here5");
 	return ht;
 }
 
 element createElement(char*string){
 	element e = (element)malloc(sizeof(struct elementOfHash));
-	e->grammar = NULL;
-	e->first = NULL;
-	e->follow = NULL;
-	e->value = string;
+	e->grammar = createListofList();
+	e->first = createLinkedList();
+	e->follow = createLinkedList();
+	char* str = (char*) malloc(sizeof(char)*20);
+	strcpy(str,string);
+	e->value = str;
 	return e;
 }
 
-void insertToHash(char* string,hashtable* ht){
+hashtable* insertToHash(char* string,hashtable* ht){
 	element e = createElement(string);
+	//printf(e->value);
 	int hash = hashcode(string);
+	//printf("%d",hash);
 	element temp = ht[hash]->head;
 	ht[hash]->head = e;
 	e->next = temp;
-	return;
+	return ht;
 }
 
 element searchInTable(hashtable* ht,char* string){
 	int hash = hashcode(string);
-	element temp = ht[hash]->head;
+	element temp = createElement("");
+	temp = ht[hash]->head;
 	while(temp!=NULL){
-		if(temp->value == string)
+		//printf("%s \t %s \n", temp->value, string);
+		if(strcmp(temp->value, string)==0)
 			return temp;
 		temp = temp->next;
 	}
+	printf("element not found");
 	return NULL;
 }
 
@@ -56,10 +68,25 @@ ll createLinkedList(){
 	ls->head = NULL;
 	return ls;
 }
-node createNode(int a){
+
+node createNode(char* a){
 	node n = (node)malloc(sizeof(struct Node));
-	n->data = a;
+	char* str = (char*) malloc(sizeof(char)*20);
+	strcpy(str,a);
+	n->data = str;
+	//printf("%s\n",n->data);
 	return n;
+}
+ll insertInOrder(ll ls ,node n){
+	node temp = ls->head;
+	if(temp==NULL){
+		ls->head = n;
+		return ls;
+	}
+	while(temp->next!=NULL)
+		temp = temp->next;
+	temp->next = n;
+	return ls;
 }
 ll insertInList(ll ls,node n){
 	node temp = ls->head;
@@ -67,24 +94,49 @@ ll insertInList(ll ls,node n){
 	n->next = temp;
 	return ls; 
 }
-dl insertInListOfList(dl d,ll ls){
+void print2(dl d){
+	ll temp = createLinkedList();
+	temp = d->head;
+	while(temp!=NULL){
+		print(temp);
+		//printf("\n");
+		temp = temp->next1;
+		printf("\n");
+	}
+}
+dl insertInOrderList(dl d,ll ls){
 	ll temp = d->head;
+	if(temp==NULL){
+		d->head = ls;
+		return d;
+	}
+	while(temp->next1!=NULL)
+		temp = temp->next1;
+	temp->next1 = ls;
+	return d;
+}
+dl insertInListOfList(dl d,ll ls){
+	ll temp = createLinkedList();
+	temp = d->head;
 	d->head = ls;
 	ls->next1 = temp;
+	//print2(d);
 	return d;
 }
 
 void print(ll ls){
 	node temp = ls->head;
 	while(temp!=NULL){
-		printf("%d\t",temp->data);
+		printf("%s\t",temp->data);
 		temp = temp->next;
 	}
 }
-void print2(dl d){
+/*void print2(dl d){
 	ll temp = d->head;
 	while(temp!=NULL){
 		print(temp);
+		printf("\n");
 		temp = temp->next1;
 	}
 }
+*/
