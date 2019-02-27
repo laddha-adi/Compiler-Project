@@ -29,14 +29,16 @@ element createElement(char*string){
 	char* str = (char*) malloc(sizeof(char)*20);
 	strcpy(str,string);
 	e->value = str;
+	if(strcmp("eps", string)==0){
+		e->flag = 0;
+	}else{
+		e->flag = 1;   //-1 : Non Terminal, 0: eps, 1: Terminal
+	}
 	return e;
 }
 
-hashtable* insertToHash(char* string,hashtable* ht){
-	element e = createElement(string);
-	//printf(e->value);
-	int hash = hashcode(string);
-	//printf("%d",hash);
+hashtable* insertToHash(element e,hashtable* ht){
+	int hash = hashcode(e->value);
 	element temp = ht[hash]->head;
 	ht[hash]->head = e;
 	e->next = temp;
@@ -48,12 +50,11 @@ element searchInTable(hashtable* ht,char* string){
 	element temp = createElement("");
 	temp = ht[hash]->head;
 	while(temp!=NULL){
-		//printf("%s \t %s \n", temp->value, string);
 		if(strcmp(temp->value, string)==0)
 			return temp;
 		temp = temp->next;
 	}
-	printf("element not found");
+	printf("element not found, inserting... %s\n", string);
 	return NULL;
 }
 
@@ -69,11 +70,11 @@ ll createLinkedList(){
 	return ls;
 }
 
-node createNode(char* a){
+node createNode(element e){
 	node n = (node)malloc(sizeof(struct Node));
-	char* str = (char*) malloc(sizeof(char)*20);
-	strcpy(str,a);
-	n->data = str;
+	//char* str = (char*) malloc(sizeof(char)*20);
+	//strcpy(str,a);
+	n->ele = e;
 	//printf("%s\n",n->data);
 	return n;
 }
@@ -99,7 +100,6 @@ void print2(dl d){
 	temp = d->head;
 	while(temp!=NULL){
 		print(temp);
-		//printf("\n");
 		temp = temp->next1;
 		printf("\n");
 	}
@@ -127,10 +127,11 @@ dl insertInListOfList(dl d,ll ls){
 void print(ll ls){
 	node temp = ls->head;
 	while(temp!=NULL){
-		printf("%s\t",temp->data);
+		printf("%s(%d)\t",temp->ele->value, temp->ele->flag);
 		temp = temp->next;
 	}
 }
+
 /*void print2(dl d){
 	ll temp = d->head;
 	while(temp!=NULL){
@@ -140,3 +141,75 @@ void print(ll ls){
 	}
 }
 */
+
+
+void printNtList(ll ls){
+	node temp = ls->head;
+	while(temp!=NULL){
+		//if(temp->flag == -1) printf("%s\n",temp->data);
+		//temp = temp->next;
+	}
+}
+
+void printTList(ll ls){
+	node temp = ls->head;
+	while(temp!=NULL){
+		//if(temp->flag == 1) printf("%s\n",temp->data);
+		//temp = temp->next;
+	}
+}
+
+
+void printFollowSet(dl d){
+	ll temp = createLinkedList();
+	temp = d->head;
+	while(temp!=NULL){
+		printf("Follow [ %s ] = ",temp->head->ele->value);
+		print(temp->head->ele->first);
+		printf("\n");
+		temp = temp->next1;
+	}
+}
+
+void printT(dl d){
+	ll temp = createLinkedList();
+	temp = d->head;
+	while(temp!=NULL){
+		printTList(temp);
+		temp = temp->next1;
+	}
+}
+
+ll copyList(node n){
+	ll l = createLinkedList();
+	while(n!=NULL){
+		node t = createNode(n->ele);
+		l = insertInOrder(l, t);
+		n = n->next;
+	}
+	return l;
+}
+
+int find(node n, ll l){
+	node temp = l->head;
+	while(temp!=NULL){
+		if(strcmp(temp->ele->value, n->ele->value)==0) return 1;
+		temp = temp->next;
+	}
+	return 0;
+} 
+
+ll concatList(ll l1, ll l2){
+	node templ1 = l1->head;
+	node templ2 = l2->head;
+	if(templ1==NULL) return l2;
+	if(templ2 == NULL) return l1;
+
+	while(templ2!=NULL){
+		if(find(templ2, l1)==0){
+			l1 = insertInList(l1, createNode(templ2->ele));
+		}
+		templ2 = templ2->next;
+	}	
+	return l1;
+}

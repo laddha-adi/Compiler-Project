@@ -16,17 +16,20 @@ grammarRules readFile(char * fileName, hashtable* ht){
    		char *tok;
    		tok = (char*) malloc(sizeof(char)*20);
    		tok = strtok (grLine,delimit);
-   		
+
   		while (tok != NULL){
-    			ht = insertToHash(tok, ht);
-    			node n = createNode(tok);
+  				element e = searchInTable(ht, tok);
+    			if(e==NULL)	e = createElement(tok);
+    			node n = createNode(e);
+			    ht = insertToHash(e, ht);
 				if(n!=NULL){
 					sr = insertInOrder(sr, n);
     			}else{
     				printf("Unable to create new Element.\n");
-    			}
+				}
     		tok = strtok (NULL, delimit);
   		}
+
   		gRules = insertRule(gRules, sr);
    	}  
 	fclose(fp);
@@ -41,40 +44,41 @@ grammarRules insertRule(grammarRules gRules, singleRule sRule){
 hashtable* insertAllRulesInHash(grammarRules gr, hashtable* ht){
 	ll temp = createLinkedList();
 	temp = gr->head;
-	//print2(gr);
 	while(temp!=NULL){
-		//printf("1\n");
-		ll l = createLinkedList();
-		
-		//printf("2\n");
-		l -> head = temp -> head -> next;
-		
-		//printf("3\n");
-		element e = (element)malloc(sizeof(struct elementOfHash));
-		 e = searchInTable(ht, temp->head->data);
-		//printf("%s", e->value);
-		//printf("4\n");
-		//print(l);
-		//printf("\n");
-
-		e -> grammar = insertInOrderList(e->grammar, l);
-		
-		//printf("5\n");
-		temp = temp->next1;	
-		
-		//printf("6\n");
-
+		node nl = temp->head->next;
+		ll l_copy = copyList(nl);
+		addGrammarRule(temp->head->ele, l_copy);
+		temp = temp->next1;
 	}
 	return ht;
 }
 
+
+int NT = -1;
+int T = 1;
+int EPS = 0;
+
+void addGrammarRule(element e, ll l){
+	e -> flag = NT;
+	printf("Adding Rule ");
+	printf("%s --> ", e->value);
+	print(l);
+	printf("\n");
+	e -> grammar = insertInOrderList(e->grammar, l);
+	return; 
+}
+
+
+
 int main(){
+	//Someone Please test this! I am not able to run it on my PC.
 	hashtable* ht = createHashTable();
-	grammarRules gr = readFile("grr.txt", ht);
-	//print2(gr);
+	grammarRules gr = readFile("Grammar.txt", ht);
 	ht = insertAllRulesInHash(gr, ht);
-	print2(searchInTable(ht, "output_par")->grammar);
-	//print2(gr);
+	print2(gr);
+	addFirst(gr, ht);
+	printFollowSet(gr);
+
 	return 0;
 }
 
