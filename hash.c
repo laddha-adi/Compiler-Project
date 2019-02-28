@@ -3,16 +3,16 @@
 int hashcode(char* string){
 	int hash = 3;
 	for(int i = 0; i < strlen(string); i++){
-		hash = (hash*29 + string[i])%500;
+		hash = (hash*397 + string[i])%5000;
 	}
 	return hash;
 }
 
 hashtable* createHashTable(){
-	hashtable* ht = (hashtable*)malloc(sizeof(hashtable)*501);
+	hashtable* ht = (hashtable*)malloc(sizeof(hashtable)*5001);
 	//printf("Here6");
 	int i;
-	for(i = 0; i < 501; i++){
+	for(i = 0; i < 5001; i++){
 		ht[i]=(hashtable)malloc(sizeof(struct listForHash));
 		ht[i]->head=NULL;
 	}
@@ -26,7 +26,7 @@ element createElement(char*string){
 	e->grammar = createListofList();
 	e->first = createLinkedList();
 	e->follow = createLinkedList();
-	char* str = (char*) malloc(sizeof(char)*20);
+	char* str = (char*) malloc(sizeof(char)*50);
 	strcpy(str,string);
 	e->value = str;
 	if(strcmp("eps", string)==0){
@@ -47,14 +47,16 @@ hashtable* insertToHash(element e,hashtable* ht){
 
 element searchInTable(hashtable* ht,char* string){
 	int hash = hashcode(string);
-	element temp = createElement("");
-	temp = ht[hash]->head;
+	//element temp = createElement("");
+	element temp = ht[hash]->head;
 	while(temp!=NULL){
-		if(strcmp(temp->value, string)==0)
+		if(strcmp(temp->value, string)==0){
+			//printf("in if...\n");
 			return temp;
+		}
 		temp = temp->next;
 	}
-	printf("element not found, inserting... %s\n", string);
+	//printf("element not found, inserting... %s\n", string);
 	return NULL;
 }
 
@@ -74,6 +76,7 @@ node createNode(element e){
 	node n = (node)malloc(sizeof(struct Node));
 	//char* str = (char*) malloc(sizeof(char)*20);
 	//strcpy(str,a);
+	n->ele = (element)malloc(sizeof(struct elementOfHash));
 	n->ele = e;
 	//printf("%s\n",n->data);
 	return n;
@@ -87,6 +90,7 @@ ll insertInOrder(ll ls ,node n){
 	while(temp->next!=NULL)
 		temp = temp->next;
 	temp->next = n;
+	n->next = NULL;
 	return ls;
 }
 ll insertInList(ll ls,node n){
@@ -112,7 +116,8 @@ dl insertInOrderList(dl d,ll ls){
 	}
 	while(temp->next1!=NULL)
 		temp = temp->next1;
-	temp->next1 = ls;
+		temp->next1 = ls;
+		ls->next1 = NULL;
 	return d;
 }
 dl insertInListOfList(dl d,ll ls){
@@ -170,7 +175,6 @@ void printFollowSet(dl d){
 		temp = temp->next1;
 	}
 }
-
 void printFirstSet(dl d){
 	ll temp = createLinkedList();
 	temp = d->head;

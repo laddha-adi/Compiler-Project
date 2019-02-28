@@ -9,12 +9,12 @@ grammarRules readFile(char * fileName, hashtable* ht){
 		return gRules;
 	}	
 	char c;
-	char grLine[200];
+	char grLine[400];
 	char delimit[]=" \t\r\n\v\f";   
-    while(fgets(grLine,200,fp)!=NULL){    
+    while(fgets(grLine,400,fp)!=NULL){    
     	singleRule sr = createLinkedList();
    		char *tok;
-   		tok = (char*) malloc(sizeof(char)*20);
+   		tok = (char*) malloc(sizeof(char)*50);
    		tok = strtok (grLine,delimit);
 
   		while (tok != NULL){
@@ -57,10 +57,10 @@ hashtable* insertAllRulesInHash(grammarRules gr, hashtable* ht){
 
 void addGrammarRule(element e, ll l){
 	e -> flag = -1;
-	printf("Adding Rule ");
-	printf("%s --> ", e->value);
-	print(l);
-	printf("\n");
+	//printf("Adding Rule ");
+	//printf("%s --> ", e->value);
+	//print(l);
+	//printf("\n");
 	e -> grammar = insertInOrderList(e->grammar, l);
 	return; 
 }
@@ -70,15 +70,16 @@ void addGrammarRule(element e, ll l){
 int main(){
 	//Someone Please test this! I am not able to run it on my PC.
 	hashtable* ht = createHashTable();
-	grammarRules gr = readFile("grr.txt", ht);
+	grammarRules gr = readFile("Grammar.txt", ht);
 	ht = insertAllRulesInHash(gr, ht);
 	print2(gr);
 	addFirst(gr, ht);
 	printFirstSet(gr);
-	printf("\n--------------------------------------------------------\n");
+	//printf("\n--------------------------------------------------------\n");
 	//print(getRecursiveFirst(gr->head->head->next, ht, gr->head->head));
 	//addFollow(gr,ht);
-	return 0;
+	//printFollowSet(gr);
+//	return 0;
 }
 
 
