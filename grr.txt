@@ -1,0 +1,10 @@
+S A B C D E
+A a
+A eps
+B b 
+B eps
+C c
+D d
+D eps
+E e
+E eps

@@ -54,12 +54,9 @@ hashtable* insertAllRulesInHash(grammarRules gr, hashtable* ht){
 }
 
 
-int NT = -1;
-int T = 1;
-int EPS = 0;
 
 void addGrammarRule(element e, ll l){
-	e -> flag = NT;
+	e -> flag = -1;
 	printf("Adding Rule ");
 	printf("%s --> ", e->value);
 	print(l);
@@ -73,12 +70,14 @@ void addGrammarRule(element e, ll l){
 int main(){
 	//Someone Please test this! I am not able to run it on my PC.
 	hashtable* ht = createHashTable();
-	grammarRules gr = readFile("Grammar.txt", ht);
+	grammarRules gr = readFile("grr.txt", ht);
 	ht = insertAllRulesInHash(gr, ht);
 	print2(gr);
 	addFirst(gr, ht);
-	printFollowSet(gr);
-
+	printFirstSet(gr);
+	printf("\n--------------------------------------------------------\n");
+	//print(getRecursiveFirst(gr->head->head->next, ht, gr->head->head));
+	//addFollow(gr,ht);
 	return 0;
 }
 

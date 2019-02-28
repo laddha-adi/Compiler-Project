@@ -16,7 +16,9 @@ void addFirst(grammarRules gr, hashtable* ht){
 }
 
 
+
 ll getFirst(element e, hashtable* ht){
+
 	printf("\tFinding First of %s ...\n", e->value);
 	if(e->first->head!=NULL) {
 			ll temp_list = getFirst(e, ht);
@@ -25,7 +27,7 @@ ll getFirst(element e, hashtable* ht){
 	}
 
 	ll l = createLinkedList();
-	if(e->flag == EPS || e->flag==T) {
+	if(e->flag == 0 || e->flag==1) {
 		l = insertInList(l, createNode(createElement(e->value)));
 		return l;
 	}
@@ -44,6 +46,34 @@ ll getFirst(element e, hashtable* ht){
 		}
 		temp = temp->next1;
 	}
+	return l;
+}
+
+ll removeEps(ll l){
+	node temp = l->head;
+	if(temp==NULL) return l;
+	while(temp->next!=NULL){
+		if(strcmp(temp->next->ele->value,"eps")==0){
+			temp->next = temp->next->next;
+		}
+		temp = temp->next;
+	}
+	return l;
+}
+
+ll getRecursiveFirst(node n, hashtable* ht, node self){
+
+	ll l = createLinkedList();
+	while(n!=NULL){
+		if(self->ele!=n->ele){
+			ll temp_list = n->ele->first;
+			ll l_copy = copyList(temp_list->head);
+			l = concatList(l, l_copy);
+			if(!containsEPS(temp_list)) break;
+		}
+		n = n->next;
+	}	
+	l = removeEps(l);
 	return l;
 }
 

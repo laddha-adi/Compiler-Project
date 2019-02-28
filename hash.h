@@ -1,3 +1,6 @@
+#ifndef HASH
+#define HASH
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,3 +62,6 @@ ll copyList(node n);
 ll concatList(ll l1, ll l2);
 void printFollowSet(dl d);
 int containsEPS(ll l);
+void printFirstSet(dl d);
+
+#endif

@@ -165,6 +165,17 @@ void printFollowSet(dl d){
 	temp = d->head;
 	while(temp!=NULL){
 		printf("Follow [ %s ] = ",temp->head->ele->value);
+		print(temp->head->ele->follow);
+		printf("\n");
+		temp = temp->next1;
+	}
+}
+
+void printFirstSet(dl d){
+	ll temp = createLinkedList();
+	temp = d->head;
+	while(temp!=NULL){
+		printf("First [ %s ] = ",temp->head->ele->value);
 		print(temp->head->ele->first);
 		printf("\n");
 		temp = temp->next1;
@@ -212,4 +223,14 @@ ll concatList(ll l1, ll l2){
 		templ2 = templ2->next;
 	}	
 	return l1;
+}
+
+int containsEPS(ll l){
+	node temp = l->head;
+	while(temp!=NULL){
+		//printf("%s\t",temp->ele->value);
+		if(temp->ele->flag == 0) return 1;
+		temp = temp->next;
+	}
+	return 0;
 }
