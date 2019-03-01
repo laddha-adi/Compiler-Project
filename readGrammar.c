@@ -70,15 +70,18 @@ void addGrammarRule(element e, ll l){
 int main(){
 	//Someone Please test this! I am not able to run it on my PC.
 	hashtable* ht = createHashTable();
+	ht = insertToHash(createElement("$"), ht);
 	grammarRules gr = readFile("Grammar.txt", ht);
 	ht = insertAllRulesInHash(gr, ht);
 	print2(gr);
 	addFirst(gr, ht);
 	printFirstSet(gr);
-	//printf("\n--------------------------------------------------------\n");
+	printf("\n--------------------------------------------------------\n");
 	//print(getRecursiveFirst(gr->head->head->next, ht, gr->head->head));
+	readFollow("Follow.txt", gr, ht);
 	//addFollow(gr,ht);
-	//printFollowSet(gr);
+	printf("\nFollow Read\n");
+	printFollowSet(gr);
 //	return 0;
 }
 
