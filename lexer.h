@@ -11,12 +11,10 @@ FILE *getStream(FILE* fp,char* buffer,int bsize);
 tokenInfo getNextToken(FILE *fp, char* buffer,int bsize);
 
 
-void createHashTable();
+void createLexerHashTable();
 long long hashFunc(char* string);
 int lookup(char* lexeme);
 
 void removeComments(FILE* testfile,FILE* cleanfile);
-
-
 
 #endif

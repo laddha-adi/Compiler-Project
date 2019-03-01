@@ -51,10 +51,12 @@ void readFollow(char* fileName, grammarRules gr, hashtable*ht){
 	char c;
 	char grLine[400];
 	char delimit[]=" \t\r\n\v\f";   
+	
+	char *tok;
+   	tok = (char*) malloc(sizeof(char)*50);
+    
     while(fgets(grLine,400,fp)!=NULL){    
     	singleRule sr = createLinkedList();
-   		char *tok;
-   		tok = (char*) malloc(sizeof(char)*50);
    		tok = strtok (grLine,delimit);
    		element e_main = searchInTable(ht, tok);
    		tok = strtok(NULL, delimit);

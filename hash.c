@@ -1,19 +1,24 @@
 #include "hash.h"
-
+int MEM =0;
+int hash_size = 1000;
 int hashcode(char* string){
 	int hash = 3;
 	for(int i = 0; i < strlen(string); i++){
-		hash = (hash*397 + string[i])%5000;
+		hash = (hash*37 + string[i])%hash_size;
 	}
 	return hash;
 }
 
 hashtable* createHashTable(){
-	hashtable* ht = (hashtable*)malloc(sizeof(hashtable)*5001);
+	hashtable* ht = (hashtable*)malloc(sizeof(hashtable)*(hash_size+1));
+	MEM += (hash_size+1)*sizeof(hashtable);
+	printf("%d createHashTable \n", MEM);
 	//printf("Here6");
 	int i;
-	for(i = 0; i < 5001; i++){
+	for(i = 0; i < (hash_size + 1); i++){
 		ht[i]=(hashtable)malloc(sizeof(struct listForHash));
+		MEM += sizeof(struct listForHash);
+		printf("%d createHashTable inside for\n", MEM);
 		ht[i]->head=NULL;
 	}
 	if(ht==NULL) printf("LOL Sahil!!");
@@ -23,10 +28,19 @@ hashtable* createHashTable(){
 
 element createElement(char*string){
 	element e = (element)malloc(sizeof(struct elementOfHash));
+		
+		MEM += sizeof(struct elementOfHash);
+		printf("%d create Element\n", MEM);
+
 	e->grammar = createListofList();
 	e->first = createLinkedList();
 	e->follow = createLinkedList();
+
 	char* str = (char*) malloc(sizeof(char)*50);
+	
+		MEM += 50*sizeof(str);
+		printf("%d createElement 2\n", MEM);
+	
 	strcpy(str,string);
 	e->value = str;
 	if(strcmp("eps", string)==0){
@@ -38,6 +52,12 @@ element createElement(char*string){
 }
 
 hashtable* insertToHash(element e,hashtable* ht){
+
+	element e_1 = searchInTable(ht, e->value);
+	if(e_1 != NULL) {
+		printf("***************Collision*************** %s %s\n",e->value, e_1 -> value);
+	}
+
 	int hash = hashcode(e->value);
 	element temp = ht[hash]->head;
 	ht[hash]->head = e;
@@ -62,25 +82,36 @@ element searchInTable(hashtable* ht,char* string){
 
 dl createListofList(){
 	dl list = (dl)malloc(sizeof(struct listOfList));
+
+		MEM += sizeof(struct listOfList);
+		printf("%d createListofList\n", MEM);
+
 	list->head = NULL;
 	return list;
 }
 
 ll createLinkedList(){
 	ll ls = (ll)malloc(sizeof(struct LinkedList));
+
+		MEM += sizeof(struct LinkedList);
+		printf("%d createLinkedList\n", MEM);
+
 	ls->head = NULL;
 	return ls;
 }
 
 node createNode(element e){
 	node n = (node)malloc(sizeof(struct Node));
+
+		MEM += sizeof(struct Node);
+		printf("%d createNode\n", MEM);
 	//char* str = (char*) malloc(sizeof(char)*20);
 	//strcpy(str,a);
-	n->ele = (element)malloc(sizeof(struct elementOfHash));
 	n->ele = e;
 	//printf("%s\n",n->data);
 	return n;
 }
+
 ll insertInOrder(ll ls ,node n){
 	node temp = ls->head;
 	if(temp==NULL){
@@ -120,6 +151,7 @@ dl insertInOrderList(dl d,ll ls){
 		ls->next1 = NULL;
 	return d;
 }
+
 dl insertInListOfList(dl d,ll ls){
 	ll temp = createLinkedList();
 	temp = d->head;

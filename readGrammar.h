@@ -12,7 +12,7 @@ typedef ll singleRule;
 
 dl readFile(char * fileName, hashtable* ht);
 grammarRules insertRule(grammarRules gRules, singleRule sRule);
-hashtable* insertAllRulesInHash(grammarRules gr, hashtable* ht);
+void insertAllRulesInHash(grammarRules gr);
 void addGrammarRule(element e, ll l);
 //void addFirst(grammarRules gr, hashtable* ht);
 //ll getFirst(element e, hashtable* ht);

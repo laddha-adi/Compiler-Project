@@ -19,7 +19,7 @@ FILE *getStream(FILE* fp,char* buffer,int bsize)
 
 }
 
-void createHashTable(){
+void createLexerHashTable(){
 	const int m=1e9+9;
 
 	hashTable=(hashTableEntry**)malloc(m*sizeof(hashTableEntry));
@@ -68,7 +68,7 @@ long long hashFunc(char* string){
 tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 {
 	if(ftell(fp)==0){
-		createHashTable();
+		createLexerHashTable();
 	}
 
 	state = 1;
