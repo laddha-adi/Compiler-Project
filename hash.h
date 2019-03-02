@@ -4,12 +4,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "lexer.h"
+#include "memlog.h"
 
 typedef struct Node* node;
 typedef struct LinkedList* ll;
 typedef struct listOfList* dl;
 typedef struct elementOfHash* element;
 typedef  element* hashtable;
+typedef dl grammarRules;
+typedef ll singleRule;
 
 struct Node{
 	element ele;
@@ -59,5 +63,10 @@ ll concatList(ll l1, ll l2);
 void printFollowSet(dl d);
 int containsEPS(ll l);
 void printFirstSet(dl d);
+
+dl readFile(char * fileName, hashtable ht);
+grammarRules insertRule(grammarRules gRules, singleRule sRule);
+void insertAllRulesInHash(grammarRules gr,hashtable ht);
+void LexerMain();
 
 #endif
