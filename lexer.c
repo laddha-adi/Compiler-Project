@@ -20,7 +20,7 @@ FILE *getStream(FILE* fp,char* buffer,int bsize)
 }
 
 void createLexerHashTable(){
-	const int m=1e9+9;
+	const int m=1e2+9;
 
 	hashTable=(hashTableEntry**)malloc(m*sizeof(hashTableEntry));
 	
@@ -35,7 +35,7 @@ void createLexerHashTable(){
 		hashTable[hashFunc(keywords[j])]->keyword=(char*)malloc(15*sizeof(char));
 		strcpy(hashTable[hashFunc(keywords[j])]->keyword,keywords[j]);
 		hashTable[hashFunc(keywords[j])]->tokenId=tokenids[j];
-		//printf("%s %d \n",hashTable[hashFunc(keywords[j])]->keyword,hashTable[hashFunc(keywords[j])]->tokenId);
+		printf("%s %d \n",hashTable[hashFunc(keywords[j])]->keyword,hashTable[hashFunc(keywords[j])]->tokenId);
 	}
 
 	//printf("%s\n",hashTable[hashFunc("with")]->keyword);
@@ -55,7 +55,7 @@ int lookup(char* lexeme){
 
 long long hashFunc(char* string){
 	const int p=31;
-	const int m=1e9+9;
+	const int m=1e2+9;
 	long long hashValue=0;
 	long long power=1;
 	for(int i=0;i<strlen(string);i++){
@@ -749,6 +749,7 @@ void removeComments(FILE* testfile,FILE* cleanfile){
 		fputc(c,cleanfile);
 		c=getc(testfile);
 	}
+	rewind(testfile);
 }
 
 

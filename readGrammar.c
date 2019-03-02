@@ -86,6 +86,7 @@ void addGrammarRule(element e, ll l){
 
 int main(){
 	//Someone Please test this! I am not able to run it on my PC.
+
 	printf("\n--------------------------------------------------------");
 	printf("\nCreating HashTable\n");
     printf("--------------------------------------------------------\n\n");
