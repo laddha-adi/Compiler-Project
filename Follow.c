@@ -1,6 +1,6 @@
 #include "Follow.h"
 
-void addFollow(grammarRules gr, hashtable* ht){
+void addFollow(grammarRules gr, hashtable ht){
 	
 	element e = createElement("$");
     node n = createNode(e);
@@ -42,7 +42,7 @@ void addFollow(grammarRules gr, hashtable* ht){
 }
 
 
-void readFollow(char* fileName, grammarRules gr, hashtable*ht){
+void readFollow(char* fileName, grammarRules gr, hashtable ht){
 	FILE * fp = fopen(fileName, "r");
 	if (fp == NULL) {
 		printf("Unable to read grammar file.\n");
