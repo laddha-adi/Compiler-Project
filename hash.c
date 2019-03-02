@@ -9,49 +9,51 @@ int hashcode(char* string){
 	return hash;
 }
 
-hashtable* createHashTable(){
-	hashtable* ht = (hashtable*)malloc(sizeof(hashtable)*(hash_size+1));
+hashtable createHashTable(){
+	hashtable ht = (hashtable)malloc(sizeof(element)*(hash_size+1));
 	MEM += (hash_size+1)*sizeof(hashtable);
-	printf("%d createHashTable \n", MEM);
+	//printf("%d createHashTable \n", MEM);
 	//printf("Here6");
-	int i;
-	for(i = 0; i < (hash_size + 1); i++){
-		ht[i]=(hashtable)malloc(sizeof(struct listForHash));
-		MEM += sizeof(struct listForHash);
-		printf("%d createHashTable inside for\n", MEM);
-		ht[i]->head=NULL;
-	}
+	// int i;
+	// for(i = 0; i < (hash_size + 1); i++){
+	// 	ht[i]=(element)malloc(sizeof(struct elementOfHash));
+	// 	// MEM += sizeof(struct elementOfHash);
+	// 	// printf("%d createHashTable inside for\n", MEM);
+	// 	// //ht[i]=NULL;
+	// }
+	// //ht->head= NULL
 	if(ht==NULL) printf("LOL Sahil!!");
 	//	printf("Here5");
 	return ht;
 }
 
-element createElement(char*string){
+element createElement(char* string){
 	element e = (element)malloc(sizeof(struct elementOfHash));
 		
 		MEM += sizeof(struct elementOfHash);
-		printf("%d create Element\n", MEM);
+		//printf("%d create Element\n", MEM);
 
 	e->grammar = createListofList();
 	e->first = createLinkedList();
 	e->follow = createLinkedList();
-
+	e->value = (char*) malloc(sizeof(char)*50);
 	char* str = (char*) malloc(sizeof(char)*50);
 	
 		MEM += 50*sizeof(str);
-		printf("%d createElement 2\n", MEM);
+		//printf("%d createElement 2\n", MEM);
 	
 	strcpy(str,string);
 	e->value = str;
-	if(strcmp("eps", string)==0){
-		e->flag = 0;
-	}else{
-		e->flag = 1;   //-1 : Non Terminal, 0: eps, 1: Terminal
-	}
+	//printf("%s\n",e->value);
+	// if(strcmp("eps", str)==0){
+	// 	e->flag = 0;
+	// }else{
+	// 	e->flag = 1;   //-1 : Non Terminal, 0: eps, 1: Terminal
+	// }
 	return e;
 }
 
-hashtable* insertToHash(element e,hashtable* ht){
+hashtable insertToHash(element e,hashtable ht){
 
 	element e_1 = searchInTable(ht, e->value);
 	if(e_1 != NULL) {
@@ -59,32 +61,40 @@ hashtable* insertToHash(element e,hashtable* ht){
 	}
 
 	int hash = hashcode(e->value);
-	element temp = ht[hash]->head;
-	ht[hash]->head = e;
-	e->next = temp;
+	//element temp = ht[hash]->head;
+	//printf("here1\n");
+	ht[hash] = e;
+	//e->next = temp;
 	return ht;
 }
 
-element searchInTable(hashtable* ht,char* string){
+element searchInTable(hashtable ht,char* string){
 	int hash = hashcode(string);
 	//element temp = createElement("");
-	element temp = ht[hash]->head;
-	while(temp!=NULL){
-		if(strcmp(temp->value, string)==0){
-			//printf("in if...\n");
-			return temp;
-		}
-		temp = temp->next;
-	}
-	//printf("element not found, inserting... %s\n", string);
-	return NULL;
+	if(ht[hash]==NULL)
+		return NULL;
+	else 
+		return ht[hash];
+	//printf("%s\n",ht[hash]->value);
+	// element temp;
+	// temp = ht[hash];
+	// printf("%s\n",temp->value);
+	// // while(temp!=NULL){
+	// 	if(strcmp(temp->value, string)==0){
+	// 		printf("exists\n");
+	// 		return temp;
+	// 	}
+	// // 	temp = temp->next;
+	// // }
+	// //printf("element not found, inserting... %s\n", string);
+	// return NULL;
 }
 
 dl createListofList(){
 	dl list = (dl)malloc(sizeof(struct listOfList));
 
 		MEM += sizeof(struct listOfList);
-		printf("%d createListofList\n", MEM);
+		//printf("%d createListofList\n", MEM);
 
 	list->head = NULL;
 	return list;
@@ -94,7 +104,7 @@ ll createLinkedList(){
 	ll ls = (ll)malloc(sizeof(struct LinkedList));
 
 		MEM += sizeof(struct LinkedList);
-		printf("%d createLinkedList\n", MEM);
+		//printf("%d createLinkedList\n", MEM);
 
 	ls->head = NULL;
 	return ls;
@@ -104,7 +114,7 @@ node createNode(element e){
 	node n = (node)malloc(sizeof(struct Node));
 
 		MEM += sizeof(struct Node);
-		printf("%d createNode\n", MEM);
+		//printf("%d createNode\n", MEM);
 	//char* str = (char*) malloc(sizeof(char)*20);
 	//strcpy(str,a);
 	n->ele = e;
@@ -142,11 +152,13 @@ void print2(dl d){
 dl insertInOrderList(dl d,ll ls){
 	ll temp = d->head;
 	if(temp==NULL){
+		d->head = createLinkedList();
 		d->head = ls;
 		return d;
 	}
 	while(temp->next1!=NULL)
 		temp = temp->next1;
+		temp->next1 = createLinkedList();
 		temp->next1 = ls;
 		ls->next1 = NULL;
 	return d;

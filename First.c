@@ -1,6 +1,6 @@
 #include "First.h"
 
-void addFirst(grammarRules gr, hashtable* ht){
+void addFirst(grammarRules gr, hashtable ht){
 	
 	ll temp = gr->head;
 	while(temp!=NULL){
@@ -23,7 +23,7 @@ void addFirst(grammarRules gr, hashtable* ht){
 
 
 
-ll getFirst(element e, hashtable* ht){
+ll getFirst(element e, hashtable ht){
 
 	//printf("\tFinding First of %s ...\n", e->value);
 	if(e->first->head!=NULL) {
@@ -73,7 +73,7 @@ ll removeEps(ll l){
 	return l;
 }
 
-ll getRecursiveFirst(node n, hashtable* ht, node self){
+ll getRecursiveFirst(node n, hashtable ht, node self){
 
 	ll l = createLinkedList();
 	while(n!=NULL){

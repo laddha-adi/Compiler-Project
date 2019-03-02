@@ -10,7 +10,7 @@ typedef struct Node* node;
 typedef struct LinkedList* ll;
 typedef struct listOfList* dl;
 typedef struct elementOfHash* element;
-typedef struct listForHash* hashtable;
+typedef  element* hashtable;
 
 struct Node{
 	//char*  data;
@@ -36,15 +36,15 @@ struct elementOfHash{
 	element next;
 };
 
-struct listForHash{
-	element head;
-};
+// struct listForHash{
+// 	element head;
+// };
 
 int hashcode(char* string);
-hashtable* createHashTable();
+hashtable createHashTable();
 element createElement(char*string);
-hashtable* insertToHash(element e,hashtable* ht);
-element searchInTable(hashtable* ht,char* string);
+hashtable insertToHash(element e,hashtable ht);
+element searchInTable(hashtable ht,char* string);
 dl createListofList();
 ll createLinkedList();
 node createNode(element a);

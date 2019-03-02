@@ -6,7 +6,7 @@
 typedef dl grammarRules;
 typedef ll singleRule;
 
-void addFollow(grammarRules gr, hashtable* ht);
-void readFollow(char* fileName, grammarRules gr, hashtable*ht);
+void addFollow(grammarRules gr, hashtable ht);
+void readFollow(char* fileName, grammarRules gr, hashtable ht);
 
 #endif
