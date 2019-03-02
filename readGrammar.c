@@ -2,8 +2,8 @@
 #include <string.h>
 #include "lexer.h"
 #include "lexerDef.h"
+#include "memlog.h"
 
-int MEM2 = 0;
 
 grammarRules readFile(char * fileName, hashtable ht){
 	grammarRules gRules = createListofList();
@@ -63,51 +63,32 @@ grammarRules insertRule(grammarRules gRules, singleRule sRule){
 
 int main(){
 
-	printf("\n--------------------------------------------------------");
-	printf("\nCreating HashTable\n");
-    printf("--------------------------------------------------------\n");
-	hashtable ht = createHashTable();
+	printMem(1);
 
-	
+    LexerMain();
+
+	printf("\n----------------------------------Creating HashTable------------------------------------\n");
+	hashtable ht = createHashTable();
 	ht = insertToHash(createElement("$"), ht);
 
-
-	printf("\n--------------------------------------------------------");
-	printf("\nReading File\n");
-    printf("--------------------------------------------------------\n");
+	printf("\n----------------------------------Reading Grammar File----------------------------------\n");
 	grammarRules gr = readFile("Grammar.txt", ht);
 
 
-
-	printf("\n--------------------------------------------------------");
-	printf("\nInserting Grammar Rules in Elements\n");
-    printf("--------------------------------------------------------\n");
+	printf("\n----------------------------------Adding Rules------------------------------------------\n");
 	insertAllRulesInHash(gr,ht);
 
-	
-	printf("\n--------------------------------------------------------");
-	printf("\nAdding First\n");
-    printf("--------------------------------------------------------\n");
+	printf("\n----------------------------------Adding First------------------------------------------\n");
 	addFirst(gr, ht);
 	//printFirstSet(gr);
 
-
-	printf("\n--------------------------------------------------------");
-	printf("\nAdding Follow\n");
-    printf("--------------------------------------------------------\n");
+	printf("\n----------------------------------Adding Follow-----------------------------------------\n");
 	readFollow("Follow.txt", gr, ht);
 	//printFollowSet(gr);
 
-
-	printf("\n--------------------------------------------------------");
-	printf("\nEnd\n");
-    printf("--------------------------------------------------------\n");
+	printf("\n----------------------------------END---------------------------------------------------\n");
 
 
-    free(ht);
-    free(gr);
-
-    LexerMain();
 
 	return 0;
 }

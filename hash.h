@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 typedef struct Node* node;
 typedef struct LinkedList* ll;
 typedef struct listOfList* dl;
@@ -13,7 +12,6 @@ typedef struct elementOfHash* element;
 typedef  element* hashtable;
 
 struct Node{
-	//char*  data;
 	element ele;
 	node next;
 };
@@ -28,17 +26,15 @@ struct listOfList{
 };
 
 struct elementOfHash{
-	dl grammar;
-	ll first;
-	ll follow;
+	
 	int flag; // -1 : Non Terminal, 0: eps, 1: Terminal 
 	char* value;
-	element next;
+	
+        dl grammar;
+		ll first;
+		ll follow;
+    
 };
-
-// struct listForHash{
-// 	element head;
-// };
 
 int hashcode(char* string);
 hashtable createHashTable();
