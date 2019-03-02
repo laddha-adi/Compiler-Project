@@ -75,31 +75,6 @@ void addGrammarRule(element e, ll l){
 int main(){
 	//Someone Please test this! I am not able to run it on my PC.
 
-	FILE* fp=fopen("Testcases/testcase1.txt","r");
-	if (fp==NULL) 
-		{
-			fputs ("File error",stderr);
-			exit (1);
-		}
-	FILE* fp2=fopen("cleanfile","w");
-	if (fp2==NULL) 
-		{
-			fputs ("File error",stderr);
-			exit (1);
-		}
-	removeComments(fp,fp2);
-	int bsize=30;
-	char *buffer=(char*)malloc(bsize*sizeof(char));
-	tokenInfo token;
-	token=getNextToken(fp,buffer,bsize);
-
-	while(token.tokenId!=54){
-		printf("token %d %d %s \n",token.tokenId,token.line,token.value);
-		token=getNextToken(fp,buffer,bsize);
-	}
-
-
-
 	printf("\n--------------------------------------------------------");
 	printf("\nCreating HashTable\n");
     printf("--------------------------------------------------------\n\n");
