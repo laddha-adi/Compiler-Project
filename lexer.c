@@ -23,7 +23,8 @@ void createLexerHashTable(){
 	const int m=1e2+9;
 
 	hashTable=(hashTableEntry**)malloc(m*sizeof(hashTableEntry));
-	
+	addMem(m*sizeof(hashTableEntry), "Lexer Hash Table");
+
 	char keywords[23][15]={"with","parameters","end","while","type","global",
 	"parameter","list","input","output","int","real","endwhile","if","then","endif",
 	"read","write","return","call","record","endrecord","else"}; 
@@ -32,7 +33,9 @@ void createLexerHashTable(){
 
 	for(int j=0;j<23;j++){
 		hashTable[hashFunc(keywords[j])]=(hashTableEntry*)malloc(sizeof(hashTableEntry));
+		addMem(sizeof(hashTableEntry), "Lexer Hash Table Entry 1");
 		hashTable[hashFunc(keywords[j])]->keyword=(char*)malloc(15*sizeof(char));
+		addMem(15*sizeof(char), "Lexer Hash Table Entry 2");
 		strcpy(hashTable[hashFunc(keywords[j])]->keyword,keywords[j]);
 		hashTable[hashFunc(keywords[j])]->tokenId=tokenids[j];
 		//printf("%s %d \n",hashTable[hashFunc(keywords[j])]->keyword,hashTable[hashFunc(keywords[j])]->tokenId);
@@ -73,10 +76,12 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 
 	state = 1;
 	char* lexeme = (char*) malloc(bsize*sizeof(char*));
+		addMem(bsize*sizeof(char*), "Lexer getNextToken Entry 1");
 	memset(lexeme, 0, bsize);
 	int i = 0;
 	tokenInfo token;
 	token.value = (char*) malloc(bsize*sizeof(char*));
+		addMem(bsize*sizeof(char*), "Lexer getNextToken Entry 2");	
 	token.tokenId=0;
 
 	int error = 0;

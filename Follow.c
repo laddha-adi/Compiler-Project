@@ -15,9 +15,7 @@ void addFollow(grammarRules gr, hashtable ht){
 				ll l = getRecursiveFirst(t2->next,ht,t2);
 				ll l_copy = copyList(l->head);
 				l_copy = removeEps(l_copy);
-				
 				t2 -> ele -> follow = concatList(t2->ele->follow, l_copy);
-
 				printf("Follow for %s is : ", t2->ele->value);
 				print(t2->ele->follow);
 				printf("\n");
@@ -64,7 +62,7 @@ void readFollow(char* fileName, grammarRules gr, hashtable ht){
   				element e = searchInTable(ht, tok);
     			if(e==NULL)	{
     				printf("Element %s Not found\n", tok);
-    			}//e = createElement(tok);
+    			}
     			node n = createNode(e);
 				if(n!=NULL){
 					sr = insertInOrder(sr, n);
@@ -74,8 +72,6 @@ void readFollow(char* fileName, grammarRules gr, hashtable ht){
 				}
     		tok = strtok (NULL, delimit);
   		}
-  		//print(sr);
-  		//printf("\n");
   		e_main->follow = sr;
    	}  
 	fclose(fp);

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "memlog.h"
 
 #include "lexerDef.h"
 #ifndef LEXERH_INCLUDED
