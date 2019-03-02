@@ -1,4 +1,6 @@
 #include "hash.h"
+#include "memlog.h"
+
 int MEM =0;
 int hash_size = 1000;
 int hashcode(char* string){
@@ -12,44 +14,30 @@ int hashcode(char* string){
 hashtable createHashTable(){
 	hashtable ht = (hashtable)malloc(sizeof(element)*(hash_size+1));
 	MEM += (hash_size+1)*sizeof(hashtable);
-	//printf("%d createHashTable \n", MEM);
-	//printf("Here6");
-	// int i;
-	// for(i = 0; i < (hash_size + 1); i++){
-	// 	ht[i]=(element)malloc(sizeof(struct elementOfHash));
-	// 	// MEM += sizeof(struct elementOfHash);
-	// 	// printf("%d createHashTable inside for\n", MEM);
-	// 	// //ht[i]=NULL;
-	// }
-	// //ht->head= NULL
-	if(ht==NULL) printf("LOL Sahil!!");
-	//	printf("Here5");
+	if(ht==NULL) printf("Memory Error!\n");	
 	return ht;
 }
 
 element createElement(char* string){
 	element e = (element)malloc(sizeof(struct elementOfHash));
 		
-		MEM += sizeof(struct elementOfHash);
-		//printf("%d create Element\n", MEM);
-
+	addMem(sizeof(struct elementOfHash), "createElement");
+		
 	e->grammar = createListofList();
 	e->first = createLinkedList();
 	e->follow = createLinkedList();
 	e->value = (char*) malloc(sizeof(char)*50);
 	char* str = (char*) malloc(sizeof(char)*50);
 	
-		MEM += 50*sizeof(str);
-		//printf("%d createElement 2\n", MEM);
-	
+
 	strcpy(str,string);
 	e->value = str;
 	//printf("%s\n",e->value);
-	// if(strcmp("eps", str)==0){
-	// 	e->flag = 0;
-	// }else{
-	// 	e->flag = 1;   //-1 : Non Terminal, 0: eps, 1: Terminal
-	// }
+	if(strcmp("eps", str)==0){
+		e->flag = 0;
+	}else{
+		e->flag = 1;   //-1 : Non Terminal, 0: eps, 1: Terminal
+	}
 	return e;
 }
 

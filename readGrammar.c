@@ -1,6 +1,7 @@
 #include "readGrammar.h"
 #include <string.h>
 #include "lexer.h"
+#include "lexerDef.h"
 
 int MEM2 = 0;
 
@@ -17,20 +18,13 @@ grammarRules readFile(char * fileName, hashtable ht){
     while(fgets(grLine,400,fp)!=NULL){    
     	singleRule sr = createLinkedList();
    		char *tok;
-   		/*tok = (char*) malloc(sizeof(char)*50);
- 			MEM2 += 50*sizeof(char);
-			printf("%dreadGrammar -> readFile\n", MEM2);*/
    		tok = strtok (grLine,delimit);
 
   		while (tok != NULL){
   				element e = searchInTable(ht, tok);
     			if(e==NULL)	{
     				e = createElement(tok);
-    				//printf("created\n");
     				ht = insertToHash(e, ht);
-    			}
-    			else{
-    				//printf("collided\n");
     			}
     			node n = createNode(e);
 				if(n!=NULL){
@@ -53,18 +47,13 @@ grammarRules insertRule(grammarRules gRules, singleRule sRule){
 }
 
  void insertAllRulesInHash(grammarRules gr,hashtable ht){
-	//ll temp = createLinkedList();
 	ll temp = gr->head;
 	while(temp!=NULL){
 		element e = searchInTable(ht,temp->head->ele->value);
 		ll n = createLinkedList();
 		n->head = temp->head->next;
-		// print(n);
-		// printf("\n");
+		e->flag = -1;
 		e->grammar = insertInListOfList(e->grammar,n);
-		print2(e->grammar);
-		printf("\n");
-		//addGrammarRule(temp->head->ele, temp);
 		temp = temp->next1;
 	}
 	return ;
@@ -72,98 +61,72 @@ grammarRules insertRule(grammarRules gRules, singleRule sRule){
 
 
 
-void addGrammarRule(element e, ll l){
-	e -> flag = -1;
-	//printf("Adding Rule ");
-	//printf("%s --> ", e->value);
-	print(l);
-	printf("\n");
-	e -> grammar = insertInOrderList(e->grammar, l);
-	return; 
+int main(){
+
+	printf("\n--------------------------------------------------------");
+	printf("\nCreating HashTable\n");
+    printf("--------------------------------------------------------\n");
+	hashtable ht = createHashTable();
+
+	
+	ht = insertToHash(createElement("$"), ht);
+
+
+	printf("\n--------------------------------------------------------");
+	printf("\nReading File\n");
+    printf("--------------------------------------------------------\n");
+	grammarRules gr = readFile("Grammar.txt", ht);
+
+
+
+	printf("\n--------------------------------------------------------");
+	printf("\nInserting Grammar Rules in Elements\n");
+    printf("--------------------------------------------------------\n");
+	insertAllRulesInHash(gr,ht);
+
+	
+	printf("\n--------------------------------------------------------");
+	printf("\nAdding First\n");
+    printf("--------------------------------------------------------\n");
+	addFirst(gr, ht);
+	//printFirstSet(gr);
+
+
+	printf("\n--------------------------------------------------------");
+	printf("\nAdding Follow\n");
+    printf("--------------------------------------------------------\n");
+	readFollow("Follow.txt", gr, ht);
+	//printFollowSet(gr);
+
+
+	printf("\n--------------------------------------------------------");
+	printf("\nEnd\n");
+    printf("--------------------------------------------------------\n");
+
+
+    free(ht);
+    free(gr);
+
+    LexerMain();
+
+	return 0;
 }
 
-
-
-int main(){
-	//Someone Please test this! I am not able to run it on my PC.
+void LexerMain(){
 	FILE* fp=fopen("Testcases/testcase1.txt","r");
 	if (fp==NULL) 
 		{
 			fputs ("File error",stderr);
 			exit (1);
 		}
+	
 	FILE* fp2=fopen("cleanfile","w");
 	if (fp2==NULL) 
 		{
 			fputs ("File error",stderr);
 			exit (1);
 		}
-	removeComments(fp,fp2);
-	int bsize=30;
-	char *buffer=(char*)malloc(bsize*sizeof(char));
-	tokenInfo token;
-	token=getNextToken(fp,buffer,bsize);
 
-	while(token.tokenId!=54){
-		printf("token %d %d %s \n",token.tokenId,token.line,token.value);
-		token=getNextToken(fp,buffer,bsize);
-	}
-	printf("\n--------------------------------------------------------");
-	printf("\nCreating HashTable\n");
-    printf("--------------------------------------------------------\n\n");
-
-	hashtable ht = createHashTable();
-
-	
-	ht = insertToHash(createElement("$"), ht);
-
-	printf("\n\n--------------------------------------------------------");
-	printf("\nReading File\n");
-    printf("--------------------------------------------------------\n\n");
-	grammarRules gr = readFile("Grammar.txt", ht);
-	printf("------------------------ %d ------------------------\n\n", MEM2);
-	print2(gr);
-	printf("\n\n--------------------------------------------------------");
-	printf("\nInsert Grammar Rules in Elements\n");
-    printf("--------------------------------------------------------\n\n");
-	
-	insertAllRulesInHash(gr,ht);
-	//print2(gr);
-	
-	printf("\n\n--------------------------------------------------------");
-	printf("\nAdding First\n");
-    printf("--------------------------------------------------------\n\n");
-	addFirst(gr, ht);
-	printFirstSet(gr);
-	//printf("\n--------------------------------------------------------\n");
-	//print(getRecursiveFirst(gr->head->head->next, ht, gr->head->head));
-	printf("\n\n--------------------------------------------------------");
-	printf("\nAdding Follow\n");
-    printf("--------------------------------------------------------\n\n");
-	readFollow("Follow.txt", gr, ht);
-	//addFollow(gr,ht);
-	//printf("\nFollow Read\n");
-	printFollowSet(gr);
-
-	printf("\n\n--------------------------------------------------------");
-	printf("\nEnd\n");
-    printf("--------------------------------------------------------\n\n");
-
-    free(ht);
-    free(gr);
-    
-    FILE* fp=fopen("Testcases/testcase1.txt","r");
-	if (fp==NULL) 
-		{
-			fputs ("File error",stderr);
-			exit (1);
-		}
-	FILE* fp2=fopen("cleanfile","w");
-	if (fp2==NULL) 
-		{
-			fputs ("File error",stderr);
-			exit (1);
-		}
 	removeComments(fp,fp2);
 	int bsize=30;
 	char *buffer=(char*)malloc(bsize*sizeof(char));
@@ -175,9 +138,6 @@ int main(){
 		token=getNextToken(fp,buffer,bsize);
 	}
 
-
-
-	return 0;
 }
 
 
