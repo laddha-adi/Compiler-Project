@@ -1,7 +1,7 @@
 #ifndef FIRST
 #define FIRST
 
-#include "readGrammar.h"
+// #include "readGrammar.h"
 #include "hash.h"
 #include <string.h>
 

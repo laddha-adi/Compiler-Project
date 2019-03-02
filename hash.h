@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+// #include "First.h"
+// #include "Follow.h"
+#include "lexer.h"
 
 
 typedef struct Node* node;
@@ -11,6 +14,10 @@ typedef struct LinkedList* ll;
 typedef struct listOfList* dl;
 typedef struct elementOfHash* element;
 typedef  element* hashtable;
+typedef dl grammarRules;
+typedef ll singleRule;
+
+
 
 struct Node{
 	//char*  data;
@@ -40,6 +47,10 @@ struct elementOfHash{
 // 	element head;
 // };
 
+dl readFile(char * fileName, hashtable ht);
+grammarRules insertRule(grammarRules gRules, singleRule sRule);
+void insertAllRulesInHash(grammarRules gr,hashtable ht);
+void addGrammarRule(element e, ll l);
 int hashcode(char* string);
 hashtable createHashTable();
 element createElement(char*string);
