@@ -35,7 +35,7 @@ void createLexerHashTable(){
 		hashTable[hashFunc(keywords[j])]->keyword=(char*)malloc(15*sizeof(char));
 		strcpy(hashTable[hashFunc(keywords[j])]->keyword,keywords[j]);
 		hashTable[hashFunc(keywords[j])]->tokenId=tokenids[j];
-		printf("%s %d \n",hashTable[hashFunc(keywords[j])]->keyword,hashTable[hashFunc(keywords[j])]->tokenId);
+		//printf("%s %d \n",hashTable[hashFunc(keywords[j])]->keyword,hashTable[hashFunc(keywords[j])]->tokenId);
 	}
 
 	//printf("%s\n",hashTable[hashFunc("with")]->keyword);
