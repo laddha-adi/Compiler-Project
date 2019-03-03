@@ -1,14 +1,35 @@
-##ifndef PARSER_DEF
-#define PARSER_DEF
+#ifndef HASH
+#define HASH
 
-#include "hash.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+// #include "First.h"
+// #include "Follow.h"
+#include "lexer.h"
 
-typedef struct 
+typedef struct Node* node;
+typedef struct Helement* helement;
+typedef helement* hashtable;
+// typedef struct LinkedList* ll;
+
+struct Node
 {
-	ll rules;
-	int error;
+	char* string;
+	int flag;
+	node next;
+};
 
-}ptEntry;
+struct Helement{
+
+	node first;
+	node follow;
+	int* rules;
+	int nrules;
+	char* value;
+	int flag;
+
+};
 
 
 
