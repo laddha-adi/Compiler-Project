@@ -464,7 +464,7 @@ void main(){
 		}
 		printf("\n");
 	}	
-	printf("%d\n",pt[getRowIndex("typeDefinitions")][getColumnIndex("TK_TYPE")]);
+	//printf("%d\n",pt[getRowIndex("typeDefinitions")][getColumnIndex("TK_TYPE")]);
 	// printf("%d\n",getColumnIndex("TK_MAIN"));
 	// printf("%d\n",getRowIndex("booleanExpression"));
 
