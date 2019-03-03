@@ -433,39 +433,3 @@ int epsinFirst(node nonterminal,hashtable ht){
 	}
 	return 0;
 }
-
-void main(){
-	hashtable ht=createHashTable();
-	node* grules=readGrammar("Grammar.txt",ht);
-	// helement h=searchInTable(ht,"booleanExpression");
-	getFollow(ht,"Follow.txt");
-	getFirst(ht,"First.txt");
-	parseTable pt=createParseTable(ht,grules);
-
-	//parseTable pt=createParseTable(ht,grules);
-	// printf("THIS IS THE FIRST ");
-	// printrule(ht[hashcode(grules[46]->string)]->first);
-	// node temp=getFirstAlpha(grules[1]->next,ht);
-	
-	// printrule(ht[hashcode(grules[46]->string)]->first);
-	// printrule(temp);
-	//printf("%d ",grules);
-
-
-	// for(int i=56;i<Ngrammar;i++){
-		// node firstalpha=(node)malloc(Ngrammar*sizeof(struct Node));
-		// firstalpha=getFirstAlpha(grules[18]->next, ht);
-		// printrule(firstalpha);
-	// }
-	
-	for(int i=0;i<PTrows;i++){
-		for(int j=0;j<PTcols;j++){
-			printf("%d  ",pt[i][j] );
-		}
-		printf("\n");
-	}	
-	//printf("%d\n",pt[getRowIndex("typeDefinitions")][getColumnIndex("TK_TYPE")]);
-	// printf("%d\n",getColumnIndex("TK_MAIN"));
-	// printf("%d\n",getRowIndex("booleanExpression"));
-
-}
