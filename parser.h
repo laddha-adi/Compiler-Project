@@ -26,7 +26,11 @@ treenode createTreeNode(char *lexeme, int id);
 /*nonLeafNode* createNonLeafNode();
 leafNode* createLeafNOde();
 */
+void sync(int X, int ip);
+void error(int X, int ip);
+int isTerminal(int X);
 treenode* parser();
-
+treenode  addChildrenRule(treenode parent, node gListHead);
+int getId(char* str);
 
 #endif
