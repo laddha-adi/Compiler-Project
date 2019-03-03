@@ -238,16 +238,371 @@ void printRuleNo(helement h){
 		printf("%d \n", h->rules[i]);
 	}
 }
+
+int stack_size = 100;
+
+
+stack createStack(){
+	stack s = (stack) malloc(sizeof(struct Stack));
+	s->arr = (int*) malloc(sizeof(int)*stack_size);
+	s->top = -1;
+	return s;
+}
+
+void push(stack s, int rule_no){
+	s->top++;
+	if(s->top==stack_size) printf("Stack size reached\n");
+	s->arr[s->top] = rule_no;
+}
+
+int getTop(stack s){
+	return s->arr[s->top];
+}
+
+
+int pop(stack s){
+	int d = s->arr[s->top];
+	s->top--;
+	return d;
+}
+
+
+int isEmpty(stack s){
+	if(s->top == -1) return 1;
+	return 0;
+}
+
+treenode createTreeNode(char *a, int Id){
+	treenode newNode = (treenode) malloc(sizeof(struct TreeNode)); 
+	
+	newNode->children = NULL;
+	newNode->next = NULL;
+	newNode->parent = NULL;
+	newNode->prev = NULL;
+
+	char* c_temp = (char*) malloc(sizeof(char)*30);
+	strcpy(c_temp, a);
+	newNode -> lexeme = c_temp;
+	newNode -> id = Id;
+	return newNode;
+}
+/*nonLeafNode* createNonLeafNode(){
+	return (nonLeafNode) malloc(sizeof(struct NonLeafNode)); 
+}
+leafNode* createLeafNOde(){
+	return (leafNode) malloc(sizeof(struct LeafNode)); 
+}
+*/
+
+void printTree(treenode t){
+	printf("%s ==> ",t->lexeme);
+	treenode temp = t->children;
+	while(temp!=NULL) {
+		printf("%s,",temp->lexeme);
+		temp = temp -> next;
+	}
+	printf("\n");
+	treenode temp2 = t->children;
+	while(temp2!=NULL) {
+		printTree(temp2);
+		temp2 = temp2 -> next;
+	}
+	return;
+}
+/*
+treenode parseInputSourceCode(char* testCasefile, table pTable, node* gRules){
+	FILE* fp=fopen(testCasefile,"r");
+	if (fp==NULL) 
+		{
+			fputs ("File error",stderr);
+			exit (1);
+		}
+
+	int bsize=30;
+	char *buffer=(char*)malloc(bsize*sizeof(char));
+	tokenInfo token;
+	token=getNextToken(fp,buffer,bsize);
+	int ip = token.tokenId;
+
+	stack s = createStack();
+	push(s, 54);
+	push(s, 0);
+
+	treenode t_head = createTreeNode("program",0);
+	treenode t_ptr = t_head;
+
+	int X = top(s); 
+	
+	while(X!=54){  // (X != $ )
+		if(X==ip) {
+			int t = pop(s);
+			ip = getNextToken(fp,buffer,bsize).tokenId;
+			
+			//Go to parent ya right
+			while(t_ptr->next == NULL){
+				if(t_ptr==t_head){
+					return t_head;
+				}
+				t_ptr = t_ptr -> parent;
+			}
+			t_ptr = t_ptr -> next;
+		}
+
+		else if(isTerminal(X)){
+			error(X, ip);
+			// moove tree pointer right or up.
+		}
+		else if(pTable[X][a] == -1){
+			//Error
+			error(X, ip);
+		}
+		else if(pTable[X][a] == -2){
+			//Sync
+			sync(X,ip);
+		}
+		else {
+			int rule_id = pTable[X][ip];
+			node rule = gRules[rule_id];
+			//Insert Rule in parse Tree.
+			rule = rule -> next;
+			if(strcmp(rule->value,"eps")!=0){
+				if()
+					t_ptr = addChildrenRule(t_ptr,rule)
+				
+				//pop the stack.
+				pop(s);
+
+				stack temp_stack = createStack(); 
+				//push in dummy stack;
+				node temp = rule;
+				while(temp!=null){
+					int temp_id = getId(temp->value);
+					push(temp_stack, temp_id);
+				}
+				while(!isEmpty(temp_stack)){
+					push(s, pop(temp_stack));
+				}
+			}
+
+			else{
+				//handle eps.
+				pop(s);
+			}
+
+		}
+		X = top(s);
+	}
+
+	error(X,ip);
+	return t_head;
+}
+*/
+void error(int X, int ip){
+	printf("X : %d ip: %d", X, ip);
+}
+
+void sync(int X, int ip){
+	printf("X : %d ip: %d", X, ip);
+}
+
+int getId(char* a){
+	return 1;
+}
+/*
+void printParseTree(table pTable,char* outFile){
+	
+}*/
+
+int isTerminal(int X){
+
+	//add if (X is a terminal ) return 1; stmt.
+
+	return 0;
+}
+
+void addChild(treenode pNode, treenode cNode){
+	treenode temp = pNode->children;
+	cNode->parent = pNode;
+	if(temp==NULL) {
+		pNode->children = cNode;
+		return;
+	}
+	while(temp->next != NULL) temp = temp->next;
+	temp->next = cNode;
+	cNode->prev = temp;
+}
+
+treenode  addChildrenRule(treenode parent, node gListHead){
+	node temp = gListHead;
+	int a = 1;
+	treenode ret_node;
+	while(temp!=NULL){
+		a--;
+		int id = getId(temp->string);
+		treenode t_node = createTreeNode(temp->string,id);
+		if(a==0) ret_node = t_node;
+		addChild(parent,t_node);
+		temp = temp->next;
+	}
+	printf("Add Child Error\n");
+	return ret_node;
+}
+
+
 void main(){
 	hashtable ht=createHashTable();
-	node* grules=readGrammar("Grammar.txt",ht);
-	helement h=searchInTable(ht,"booleanExpression");
+	readGrammar("Grammar.txt",ht);
+	printf("Worked");
+	//printf("%s", grules[0]->string);
+
+/*	helement h=searchInTable(ht,"booleanExpression");
 
 	//printf("%s",h->value);
 	//printRuleNo(h);
 	getFollow(ht,"Follow.txt");
-	getFirst(ht,"First.txt");
+	getFirst(ht,"First.txt");*/
 	// printrule(grules[0]);
-	
 
+	/*stack s = createStack();
+	push(s, 1);
+	push(s, 2);
+	printf("%d", pop(s));
+	printf("%d", getTop(s));
+	printf("%d", pop(s));
+	printf("%d", isEmpty(s));*/
+
+	/*treenode t1 = createTreeNode("A");
+	treenode t2 = createTreeNode("B");
+	treenode t3 = createTreeNode("C");
+	treenode t4 = createTreeNode("D");
+
+	addChild(t1, t2);
+	addChild(t1, t3);
+	addChild(t2, t4);
+	printTree(t1);*/
+	//table pTable;
+	//treenode t = parseInputSourceCode("Testcases/testcase1.txt", pTable);
+	//int 
+	//treenode t = testCode()
+
+
+	//int gRules[2][3];
+
+
+}
+
+void LexerMain(){
+	FILE* fp=fopen("Testcases/testcase1.txt","r");
+	if (fp==NULL) 
+		{
+			fputs ("File error",stderr);
+			exit (1);
+		}
+	
+	int bsize=30;
+	char *buffer=(char*)malloc(bsize*sizeof(char));
+	tokenInfo token;
+	token=getNextToken(fp,buffer,bsize);
+
+	while(token.tokenId!=54){
+		printf("token %d %d %s \n",token.tokenId,token.line,token.value);
+		token=getNextToken(fp,buffer,bsize);
+	}
+
+}
+
+int i = 0;
+int getNToken(){
+//	tokenInfo token;
+//	token.value = (char*) malloc(bsize*sizeof(char*));
+//	token.tokenId=0;
+
+	int arr[] = {2,3,5,1,6,4,7};
+
+	int a = arr[i];
+	i++;
+	return arr[i];
+
+}
+
+
+treenode testCode(int** pTable, node* gRules){
+
+	int bsize=30;
+	char *buffer=(char*)malloc(bsize*sizeof(char));
+	int token;
+	token = getNToken();
+	int ip = token;
+
+	stack s = createStack();
+	push(s, 54);
+	push(s, 0);
+
+	treenode t_head = createTreeNode("program",0);
+	treenode t_ptr = t_head;
+
+	int X = getTop(s); 
+	
+	while(X!=54){  // (X != $ )
+		if(X==ip) {
+			int t = pop(s);
+			ip = getNToken();
+			
+			//Go to parent ya right
+			while(t_ptr->next == NULL){
+				if(t_ptr==t_head){
+					return t_head;
+				}
+				t_ptr = t_ptr -> parent;
+			}
+			t_ptr = t_ptr -> next;
+		}
+
+		else if(isTerminal(X)){
+			error(X, ip);
+			// moove tree pointer right or up.
+		}
+		else if(pTable[X][ip] == -1){
+			//Error
+			error(X, ip);
+		}
+		else if(pTable[X][ip] == -2){
+			//Sync
+			sync(X,ip);
+		}
+		else {
+			int rule_id = pTable[X][ip];
+			node rule = gRules[rule_id];
+			//Insert Rule in parse Tree.
+			rule = rule -> next;
+			
+			if(strcmp(rule->string,"eps")!=0){
+					t_ptr = addChildrenRule(t_ptr,rule);
+				//pop the stack.
+			
+				pop(s);
+
+				stack temp_stack = createStack(); 
+				//push in dummy stack;
+				node temp = rule;
+				while(temp!=NULL){
+					int temp_id = getId(temp->string);
+					push(temp_stack, temp_id);
+				}
+				while(!isEmpty(temp_stack)){
+					push(s, pop(temp_stack));
+				}
+			}
+
+			else{
+				//handle eps.
+				pop(s);
+			}
+
+		}
+		X = getTop(s);
+	}
+
+	error(X,ip);
+	return t_head;
 }
