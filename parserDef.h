@@ -11,12 +11,13 @@
 typedef struct Node* node;
 typedef struct Helement* helement;
 typedef helement* hashtable;
+typedef int** parseTable;   //-2 entry denotes syn -1:error else ruleno
 // typedef struct LinkedList* ll;
 
 struct Node
 {
 	char* string;
-	int flag;
+	int flag;//terminal 1 nonterminal-1 eps 0
 	node next;
 };
 
