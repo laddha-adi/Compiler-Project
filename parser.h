@@ -23,5 +23,21 @@ int hashFun(char* string );
 void mergeLists(node list1,node list2);
 int epsinFirst(node nonterminal,hashtable ht);
 
+stack createStack();
+void push(stack s, int rule_no);
+int getTop(stack s);
+int pop(stack s);
+int isEmpty(stack s);
+
+treenode createTreeNode(char *lexeme, int id);
+/*nonLeafNode* createNonLeafNode();
+leafNode* createLeafNOde();
+*/
+void sync(int X, int ip);
+void error(int X, int ip);
+int isTerminal(int X);
+treenode* parser();
+treenode  addChildrenRule(treenode parent, node gListHead);
+int getId(char* str);
 
 #endif

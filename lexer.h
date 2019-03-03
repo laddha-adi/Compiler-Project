@@ -7,9 +7,7 @@
 
 FILE *getStream(FILE* fp,char* buffer,int bsize);
 
-
 tokenInfo getNextToken(FILE *fp, char* buffer,int bsize);
-
 
 void createLexerHashTable();
 long long hashFunc(char* string);

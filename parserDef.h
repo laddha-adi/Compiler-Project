@@ -32,6 +32,41 @@ struct Helement{
 
 };
 
+typedef struct Stack* stack;
 
+struct Stack{
+	int *arr;
+	int top;
+};
+
+typedef struct TreeNode* treenode; 
+
+struct TreeNode{
+	//struct nonLeafNode N;
+	//struct leafNode L;
+	treenode next;
+	treenode children;
+	treenode parent;
+	treenode prev;
+	
+	char* lexeme;
+	int id;
+};
+
+/*typedef struct LeafNode* leafNode; 
+struct LeafNode{
+	int nt_id;
+	treenode children;
+};
+
+typedef struct NonLeafNode* nonLeafNode; 
+struct NonLeafNode{
+	int nt_id;
+	treenode children;
+	int T_NT;
+};
+*/
+
+typedef int** table;
 
 #endif
