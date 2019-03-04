@@ -30,14 +30,18 @@ int pop(stack s, char* a);
 int isEmpty(stack s);
 
 treenode createTreeNode(char *lexeme, int id);
+treenode parseInputSourceCode(FILE* fp, table pTable, node* gRules, tokenInfo token, char*buffer, int bsize);
 /*nonLeafNode* createNonLeafNode();
 leafNode* createLeafNOde();
 */
+
+void printInorderTraversal(treenode root, char* outputFile);
 void sync(int X, int ip);
 void error(int X, int ip);
 int isTerminal(int X);
 treenode* parser();
 treenode  addChildrenRule(treenode parent, node gListHead);
 int getId(char* str);
-
+void getFirst(hashtable ht,char* firstfile);
+void getFollow(hashtable ht,char* followfile);
 #endif

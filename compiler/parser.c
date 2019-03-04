@@ -756,7 +756,7 @@ return i;
 /*const int bsize=1000;
 char *buffer=(char*)malloc(bsize*sizeof(char));
 */
-int main(){
+/*int main(){
     hashtable ht=createHashTable();
     node * gRules = readGrammar("Grammar.txt",ht);
     getFirst(ht,"First.txt");
@@ -796,5 +796,5 @@ char *buffer=(char*)malloc(bsize*sizeof(char));
    printTree(w);
     // if(fclose(lexerfile)==0) printf("lexerFile closed\n");
     return 0;
-}
+}*/
 

@@ -758,28 +758,16 @@ void removeComments(FILE* testfile,FILE* cleanfile){
 	}
 	rewind(testfile);
 }
-/*
-void main(){
 
-	FILE* fp=fopen("Testcases/minimal.txt","r");
-	    if (fp==NULL) 
-        {
-            fputs ("File error",stderr);
-            exit (1);
-        }
-    
-    int bsize=30;
-    char *buffer=(char*)malloc(bsize*sizeof(char));
-    tokenInfo token;
-    token=getNextToken(fp,buffer,bsize);
 
-    while(token.tokenId!=54){
-        //printf("token %d %d %s \n",token.tokenId,token.line,token.value);
-        token=getNextToken(fp,buffer,bsize);
-    }
-	printf("%d\n",lookup("end") );
+void printRemoveComments(char* testfileName, char* cleanfileName){
+	FILE* testfile = fopen(testfileName, "r");
+	FILE* cleanfile = fopen(cleanfileName, "w");
+	removeComments(testfile,cleanfile);
+	fclose(testfile);
+	fclose(cleanfile);
+	return;
 }
-*/
 
 
 

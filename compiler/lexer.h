@@ -14,5 +14,6 @@ long long hashFunc(char* string);
 int lookup(char* lexeme);
 
 void removeComments(FILE* testfile,FILE* cleanfile);
+void printRemoveComments(char* testfileName, char* cleanfileName);
 
 #endif
