@@ -1,10 +1,19 @@
+/*
+GROUP NUMBER: 11
+NIKKI GUPTA 2016A7PS0057P
+SAHIL RANADIVE 2016A7PS0097P
+ADITI AGARWAL 2016A7PS0095P
+ADITYA LADDHA 2016A7PS0038P
+*/
+
+
 #include  "lexer.h"
-#include "lexerDef.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 hashTableEntry** hashTable;
+// int lineNo=1;
 
 FILE *getStream(FILE* fp,char* buffer,int bsize)
 {
@@ -23,8 +32,7 @@ void createLexerHashTable(){
 	const int m=1e2+9;
 
 	hashTable=(hashTableEntry**)malloc(m*sizeof(hashTableEntry));
-	addMem(m*sizeof(hashTableEntry), "Lexer Hash Table");
-
+	
 	char keywords[23][15]={"with","parameters","end","while","type","global",
 	"parameter","list","input","output","int","real","endwhile","if","then","endif",
 	"read","write","return","call","record","endrecord","else"}; 
@@ -33,9 +41,7 @@ void createLexerHashTable(){
 
 	for(int j=0;j<23;j++){
 		hashTable[hashFunc(keywords[j])]=(hashTableEntry*)malloc(sizeof(hashTableEntry));
-		addMem(sizeof(hashTableEntry), "Lexer Hash Table Entry 1");
 		hashTable[hashFunc(keywords[j])]->keyword=(char*)malloc(15*sizeof(char));
-		addMem(15*sizeof(char), "Lexer Hash Table Entry 2");
 		strcpy(hashTable[hashFunc(keywords[j])]->keyword,keywords[j]);
 		hashTable[hashFunc(keywords[j])]->tokenId=tokenids[j];
 		//printf("%s %d \n",hashTable[hashFunc(keywords[j])]->keyword,hashTable[hashFunc(keywords[j])]->tokenId);
@@ -75,13 +81,11 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 	}
 
 	state = 1;
-	char* lexeme = (char*) malloc(bsize*sizeof(char*));
-		addMem(bsize*sizeof(char*), "Lexer getNextToken Entry 1");
+	char* lexeme = (char*) malloc(bsize*sizeof(char));
 	memset(lexeme, 0, bsize);
 	int i = 0;
 	tokenInfo token;
-	token.value = (char*) malloc(bsize*sizeof(char*));
-		addMem(bsize*sizeof(char*), "Lexer getNextToken Entry 2");	
+	token.value = (char*) malloc(bsize*sizeof(char));
 	token.tokenId=0;
 
 	int error = 0;
@@ -89,10 +93,10 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 	while(1){
 		if (offset == bsize || buffer[offset] == '\0'|| strlen(buffer)==0 ){
 			if(feof(fp)){
-				// printf("\nScanning Complete!\n");
+				
 				if(strlen(lexeme)!=0){
 					if(token.tokenId==0){
-						printf("ERROR_3: Unknown pattern <%s> at line number <%d>\n", lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error=1;
 						lexicalerror=1;
 						state=1;
@@ -101,6 +105,11 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					else{
 						strcpy(token.value,lexeme);
 						token.line=lineNo;
+						if(token.tokenId==3){
+							if(lookup(token.value)!=-1){
+								token.tokenId=lookup(token.value);
+							}
+						}
 						return token;
 					}
 				}
@@ -119,7 +128,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 		}
 
 		switch(state){
-			//starting state
+			
 			case 1:
 				switch(buffer[offset])
 				{
@@ -317,7 +326,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 							break;
 					default:
 					lexicalerror = 1;
-						printf("ERROR_2: Unknown Symbol <%c> at line<%d>\n",buffer[offset], lineNo);
+						printf("Line No %d : Error: Unknown Symbol <%c>\n",lineNo, buffer[offset]);
 						offset++;
 						error = 1;
 						state=1;
@@ -364,7 +373,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					lexeme[i++]=buffer[offset++];
 				}
 				else{
-					printf("ERROR_3: Unknown pattern <%s> at line<%d>\n",lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -380,7 +389,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					return token;
 				}
 				else{
-					printf("ERROR_3: Unknown pattern <%s> at line<%d>\n",lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -425,7 +434,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					token.tokenId=4;
 					token.line=lineNo;
 					if(strlen(lexeme)>20){
-						printf("Error_6:Variable Identifier at line<%d> is longer than the prescribed length of 20 characters.\n", lineNo);
+						printf("Line No %d: Error: Variable Identifier is longer than the prescribed length of 20 characters.\n", lineNo);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -445,7 +454,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					token.tokenId=4;
 					token.line=lineNo;
 					if(strlen(lexeme)>20){
-						printf("Error_6:Variable Identifier at line<%d> is longer than the prescribed length of 20 characters.\n", lineNo);
+						printf("Line No %d: Error :Variable Identifier is longer than the prescribed length of 20 characters.\n", lineNo);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -478,7 +487,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					lexeme[i++] = buffer[offset++];
 				}
 				else{
-					printf("ERROR_3: Unknown pattern <%s> at line<%d>\n",lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -506,7 +515,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					strcpy(token.value,lexeme);
 					token.line=lineNo;
 					if(strlen(lexeme)>30){
-						printf("Error_6:Function Identifier at line<%d> is longer than the prescribed length of 30 characters.\n", lineNo);
+						printf("Line No %d: Error :Function Identifier is longer than the prescribed length of 30 characters.\n", lineNo);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -527,7 +536,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					token.line=lineNo;
 					strcpy(token.value,lexeme);
 					if(strlen(lexeme)>30){
-						printf("Error_6:Function Identifier at line<%d> is longer than the prescribed length of 30 characters.\n", lineNo);
+						printf("Line No %d: Error :Function Identifier is longer than the prescribed length of 30 characters.\n", lineNo);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -546,7 +555,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 
 				}
 				else{
-					printf("ERROR_3: Unknown pattern <%s> at line<%d>\n",lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -576,7 +585,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 
 				else{
-					printf("ERROR_3: Unknown pattern <%s> at line<%d>\n",lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -594,7 +603,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 
 				else{
-					printf("ERROR_3: Unknown pattern <%s> at line<%d>\n",lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -609,7 +618,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 
 				else{
-					printf("ERROR_3: Unknown pattern <%s> at line<%d>\n",lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -627,7 +636,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 
 				else{
-					printf("ERROR_3: Unknown pattern <%s> at line<%d>\n",lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -676,7 +685,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					return token;
 				}
 				else{
-					printf("ERROR_2: Unknown Symbol <%c> at line<%d>\n",buffer[offset-1], lineNo);
+					printf("Line No %d: Error : Unknown Symbol <%c>\n",lineNo, buffer[offset-1]);
 					error = 1;
 					lexicalerror=1;
 				}
@@ -690,7 +699,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					return token;
 				}
 				else{
-					printf("ERROR_2: Unknown Symbol <%c> at line<%d>\n",buffer[offset-1], lineNo);
+					printf("Line No %d: Error : Unknown Symbol <%c>\n",lineNo, buffer[offset-1]);
 					error = 1;
 					lexicalerror=1;
 				}
@@ -704,7 +713,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 
 				else{
-					printf("ERROR_3: Unknown pattern <%s> at line<%d>\n",lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error = 1;
 						lexicalerror=1;
 				}
@@ -721,7 +730,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 
 				else{
-					printf("ERROR_3: Unknown pattern <%s> at line<%d>\n",lexeme, lineNo);
+						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
 						error = 1;
 						lexicalerror=1;
 				}
@@ -750,11 +759,12 @@ void removeComments(FILE* testfile,FILE* cleanfile){
 				c=getc(testfile);
 			}
 		}
-
+		printf("%c", c);
 		fputc(c,cleanfile);
 		c=getc(testfile);
 	}
 	rewind(testfile);
+	rewind(cleanfile);
 }
 
 

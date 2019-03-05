@@ -1,70 +1,276 @@
+/*
+GROUP NUMBER: 11
+NIKKI GUPTA 2016A7PS0057P
+SAHIL RANADIVE 2016A7PS0097P
+ADITI AGARWAL 2016A7PS0095P
+ADITYA LADDHA 2016A7PS0038P
+*/
+
 
 #include "parser.h"
-#include "lexer.h"
 
-int hashFun(char* ){
+int hash_size = 10000;
+#define PTrows 52
+#define PTcols 55
+#define Ngrammar 94
+
+int hashcode(char* string){
+  const int p=31;
+  const int m=hash_size;
+  int hashValue=0;
+  long long power=1;
+  for(int i=0;i<strlen(string);i++){
+    hashValue+=(string[i]*power)%m;
+    power*=p;
+  }
+  return hashValue%m;
+}
+
+hashtable createHashTable(){
+    hashtable ht = (hashtable)malloc(sizeof( helement)*(hash_size+1));
+    if(ht==NULL) printf("Memory Error!\n");    
+    return ht;
+}
+
+void insertToHash(helement e,hashtable ht){
+
+    helement e_1 = searchInTable(ht, e->value);
+    if(e_1 != NULL) {
+        printf("***************Collision*************** \n");
+        // return e_1;
+    }
+    int hash = hashcode(e->value);
+    // printf("%d\n",hash );
+    ht[hash] = e;
+    return ;
+}
+
+
+helement searchInTable(hashtable ht,char* string){
+    int hash = hashcode(string);
+    if(ht[hash]==NULL)
+        return NULL;
+    else 
+        return ht[hash];
+}
+
+helement createHashElement(char* string){
+    helement e = (helement)malloc(sizeof(struct Helement));
+    e->rules = (int*)malloc(sizeof(int)*10);
+    e->first = NULL;
+    e->follow =NULL;
+    e->nrules=0;
+    e->value = (char*) malloc(sizeof(char)*40);
+    strcpy(e->value,string);
+    if(string[0]>='A' && string[0]<='Z'){
+                e->flag=1;
+            }
+            else if(strcmp(string,"eps")==0){
+                e->flag=0;
+            }
+            else
+                e->flag=-1;
+    return e;
+}
+
+node* readGrammar(char* filename,hashtable ht){
+	
+	node* grules=(node*)malloc(Ngrammar*sizeof(node));
+
+    
+
+    FILE* fp1=fopen(filename,"r");
+    if(fp1==NULL){
+        printf("FILE ERROR\n");
+        exit(1);
+    }
+    char* tok;
+    int i=0;
+    char grLine[400];
+    char delimit[]=" \t\r\n\v\f";   
+    while(fgets(grLine,400,fp1)!=NULL){
+        
+        grules[i]=(node)malloc(sizeof(struct Node));
+        tok = strtok (grLine,delimit);
+        
+        node temp=grules[i];
+        temp->string=(char*)malloc(40*sizeof(char));
+        strcpy(temp->string,tok);
+         temp->flag=-1;
+         
+         helement h= searchInTable(ht,tok);
+         
+         if(h==NULL){
+             h=createHashElement(tok);
+             insertToHash(h,ht);
+         }
+         h->rules[h->nrules]=i;
+         h->nrules++;
+         tok = strtok (NULL, delimit);
+
+         
+         while (tok != NULL){
+             
+             temp->next=(node)malloc(sizeof(struct Node));;
+             temp=temp->next;
+             temp->string=(char*)malloc(40*sizeof(char));
+            strcpy(temp->string,tok);
+             if(tok[0]>='A' && tok[0]<='Z'){
+                temp->flag=1;
+            }
+            else if(strcmp(tok,"eps")==0){
+                temp->flag=0;
+            }
+            else
+                temp->flag=-1;
+        
+            helement h= searchInTable(ht,tok);
+             if(h==NULL){
+                 h=createHashElement(tok);
+                 insertToHash(h,ht);
+             }
+
+            tok = strtok (NULL, delimit);
+            
+        }
+        
+        // printrule(grules[i]);
+        i++;
+    }
+    
+    rewind(fp1);
+    fclose(fp1);
+    // if(fclose(fp1)==0) printf("GrammarFile closed\n");
+    return grules;
+}
+
+
+void getFirst(hashtable ht,char* firstfile){
+	FILE * fp2 = fopen(firstfile, "r");
+	if (fp2 == NULL) {
+		printf("Unable to read follow file.\n");
+		return ;
+	}	
+
+	char grLine[400];
+	char delimit[]=" \t\r\n\v\f";   
+	
+	char *tok;
+   	tok = (char*) malloc(sizeof(char)*50);
+    
+    while(fgets(grLine,400,fp2)!=NULL){    
+    	node sr = (node)malloc(sizeof(struct Node));
+   		tok = strtok (grLine,delimit);
+   		helement nonterminal = searchInTable(ht, tok);
+   		tok = strtok(NULL, delimit);
+
+   		nonterminal->first=(node)malloc(sizeof(struct Node));
+   		node temp=nonterminal->first;
+
+  		while (tok != NULL){
+
+  				temp->string=(char*)malloc(sizeof(char)*40);
+  				temp->flag=1;
+  				strcpy(temp->string,tok);
+  				tok = strtok (NULL, delimit);
+  				if(tok!=NULL){
+  				temp->next=(node)malloc(sizeof(struct Node));
+  				temp=temp->next;
+    			}
+
+  		}
+  		temp=NULL;
+  		// printf("PRINTING FIRST\n");
+  		// printf("%s\n",nonterminal->value );
+  		// printrule(nonterminal->first);
+   	}  
+    rewind(fp2);
+    fclose(fp2);
+    // if(fclose(fp2)==0) printf("FirstFile closed\n");
+	return;
+
+
+
+}
+
+void getFollow(hashtable ht,char* followfile){
+	FILE * fp3 = fopen(followfile, "r");
+	if (fp3 == NULL) {
+		printf("Unable to read follow file.\n");
+		return ;
+	}	
+
+	char grLine[400];
+	char delimit[]=" \t\r\n\v\f";   
+	
+	char *tok;
+    int i=0;
+   	tok = (char*) malloc(sizeof(char)*50);
+    
+    while(fgets(grLine,400,fp3)!=NULL){   
+
+    	node sr = (node)malloc(sizeof(struct Node));
+   		tok = strtok (grLine,delimit);
+   		helement nonterminal = searchInTable(ht, tok);
+   		tok = strtok(NULL, delimit);
+   		nonterminal->follow=(node)malloc(sizeof(struct Node));
+   		node temp=nonterminal->follow;
+  		while (tok != NULL){
+
+  				temp->string=(char*)malloc(sizeof(char)*40);
+  				temp->flag=1;
+  				strcpy(temp->string,tok);
+  				tok = strtok (NULL, delimit);
+  				if(tok!=NULL){
+  				temp->next=(node)malloc(sizeof(struct Node));
+  				temp=temp->next;
+    			}
+
+  		}
+  		temp=NULL;
+  		// printf("PRINTING FOLLOW\n");
+  		// printf("%s\n",nonterminal->value );
+  		// printrule(nonterminal->follow);
+   	}  
+    fclose(fp3);
+    // if(fclose(fp3)==0) printf("FollowFile closed\n");
+	return;
+
+}
+
+
+
+void printrule(node ls){
+
+	node temp=ls;
+	while(temp!=NULL){
+		printf("%s %d\t",temp->string, temp->flag );
+		
+		temp=temp->next;
+	}
+	printf("\n");
+
+return ;
+
+
+}
+
+void printRuleNo(helement h){
+	for(int i=0;i<h->nrules;i++){
+		printf("%d \n", h->rules[i]);
+	}
+}
+
+
+int hashFun(char* string ){
 	int hash = 3;
 	for(int i = 0; i < strlen(string); i++){
 		hash = (hash*397 + string[i])%5000;
 	}
 	return hash;
 }
-int getRowIndex(char* s)
-{
-	switch(hashFun(s)){
-    	case : hashFun("program")  return 0;
-    	case : hashFun("mainFunction")  return 1;
-    	case : hashFun("otherFunctions")  return 2;
-    	case : hashFun("function")  return 3;
-    	case : hashFun("input_par")  return 4;
-    	case : hashFun("output_par")  return 5;
-    	case : hashFun("parameter_list")  return 6;
-    	case : hashFun("dataType")  return 7;
-    	case : hashFun("primitiveDatatype")  return 8;
-   		case : hashFun("constructedDatatype")  return 9;
-    	case : hashFun("remaining_list")  return 10;
-    	case : hashFun("stmts")  return 11;
-    	case : hashFun("typeDefinitions")  return 12;
-    	case : hashFun("typeDefinition")  return 13;
-    	case : hashFun("fieldDefinitions")  return 14;
-    	case : hashFun("fieldDefinition")  return 15;
-    	case : hashFun("moreFields")  return 16;
-    	case : hashFun("declarations")  return 17;
-    	case : hashFun("declaration")  return 18;
-    	case : hashFun("global_or_not")  return 19;
-    	case : hashFun("otherStmts")  return 20;
-    	case : hashFun("stmt")  return 21;
-    	case : hashFun("assignmentStmt")  return 22;
-    	case : hashFun("singleOrRecId")  return 23;
-        case : hashFun("new_24")  return 24;
-    	case : hashFun("funCallStmt")  return 25;
-    	case : hashFun("outputParameters")  return 26;
-    	case : hashFun("inputParameters")  return 27;
-    	case : hashFun("iterativeStmt")  return 28;
-    	case : hashFun("conditionalStmt")  return 29;
-    	case : hashFun("elsePart")  return 30;
-    	case : hashFun("ioStmt")  return 31;
-    	case : hashFun("allVar")  return 32;
-    	case : hashFun("arithmeticExpression")  return 33;
-    	case : hashFun("expPrime")  return 34;
-    	case : hashFun("term")  return 35;
-    	case : hashFun("termPrime")  return 36;
-    	case : hashFun("factor")  return 37;
-    	case : hashFun("lowPrecedenceOperators")  return 38;
-    	case : hashFun("highPrecedenceOperators")  return 39;
-    	case : hashFun("all")  return 40;
-    	case : hashFun("temp")  return 41;
-    	case : hashFun("booleanExpression")  return 42;
-   		case : hashFun("var")  return 43;
-    	case : hashFun("logicalOp")  return 44;
-    	case : hashFun("relationalOp")  return 45;
-    	case : hashFun("returnStmt")  return 46;
-    	case : hashFun("optionalReturn")  return 47;
-    	case : hashFun("idList")  return 48;
-    	case : hashFun("more_ids")  return 49;
-	}
-}
-char* getCorrespondingToken(int f){
+
+char* getCorrespondingString(int f){
     switch(f){
         case 1: return "TK_ASSIGNOP";
         case 2: return "TK_COMMENT";
@@ -78,51 +284,48 @@ char* getCorrespondingToken(int f){
         case 10: return "TK_PARAMETERS";
         case 11: return "TK_END";
         case 12: return "TK_WHILE";
-        case 13: return "TK_INT";
-        case 14: return "TK_REAL";
-        case 15: return "TK_TYPE";
-        case 16: return "TK_MAIN";
-        case 17: return "TK_GLOBAL";
-        case 18: return "TK_PARAMETER";
-        case 19: return "TK_LIST";
-        case 20: return "TK_SQL";
-        case 21: return "TK_SQR";
-        case 22: return "TK_INPUT";
-        case 23: return "TK_OUTPUT";
-        case 24: return "TK_INT";
-        case 25: return "TK_REAL";
-        case 26: return "TK_SEM";
-        case 27: return "TK_COLON";
-        case 28: return "TK_DOT";
-        case 29: return "TK_ENDWHILE";
-        case 30: return "TK_OP";
-        case 31: return "TK_CL";
-        case 32: return "TK_IF";
-        case 33: return "TK_THEN";
-        case 34: return "TK_ENDIF";
-        case 35: return "TK_READ";
-        case 36: return "TK_WRITE";
-        case 37: return "TK_RETURN";
-        case 38: return "TK_PLUS";
-        case 39: return "TK_MINUS";
-        case 40: return "TK_MUL";
-        case 41: return "TK_DIV";
-        case 42: return "TK_CALL";
-        case 43: return "TK_RECORD";
-        case 44: return "TK_ENDRECORD";
-        case 45: return "TK_ELSE";
-        case 46: return "TK_AND";
-        case 47: return "TK_OR";
-        case 48: return "TK_NOT";
-        case 49: return "TK_LT";
-        case 50: return "TK_LE";
-        case 51: return "TK_EQ";
-        case 52: return "TK_GT";
-        case 53: return "TK_GE";
-        case 54: return "TK_NE";
-        case 55: return "$";
-        case 56: return "TK_COMMA";
-        case 57: return "eps";
+        case 13: return "TK_TYPE";
+        case 14: return "TK_MAIN";
+        case 15: return "TK_GLOBAL";
+        case 16: return "TK_PARAMETER";
+        case 17: return "TK_LIST";
+        case 18: return "TK_SQL";
+        case 19: return "TK_SQR";
+        case 20: return "TK_INPUT";
+        case 21: return "TK_OUTPUT";
+        case 22: return "TK_INT";
+        case 23: return "TK_REAL";
+        case 24: return "TK_COMMA";
+        case 25: return "TK_SEM";
+        case 26: return "TK_COLON";
+        case 27: return "TK_DOT";
+        case 28: return "TK_ENDWHILE";
+        case 29: return "TK_OP";
+        case 30: return "TK_CL";
+        case 31: return "TK_IF";
+        case 32: return "TK_THEN";
+        case 33: return "TK_ENDIF";
+        case 34: return "TK_READ";
+        case 35: return "TK_WRITE";
+        case 36: return "TK_RETURN";
+        case 37: return "TK_PLUS";
+        case 38: return "TK_MINUS";
+        case 39: return "TK_MUL";
+        case 40: return "TK_DIV";
+        case 41: return "TK_CALL";
+        case 42: return "TK_RECORD";
+        case 43: return "TK_ENDRECORD";
+        case 44: return "TK_ELSE";
+        case 45: return "TK_AND";
+        case 46: return "TK_OR";
+        case 47: return "TK_NOT";
+        case 48: return "TK_LT";
+        case 49: return "TK_LE";
+        case 50: return "TK_EQ";
+        case 51: return "TK_GT";
+        case 52: return "TK_GE";
+        case 53: return "TK_NE";
+        case 54: return "$";
 
         case 100: return "program";
         case 101: return "mainFunction";
@@ -148,96 +351,603 @@ char* getCorrespondingToken(int f){
         case 121: return "stmt";
         case 122: return "assignmentStmt";
         case 123: return "singleOrRecId";
-        case 124: return "funCallStmt";
-        case 125: return "outputParameters";
-        case 126: return "inputParameters";
-        case 127: return "iterativeStmt";
-        case 128: return "conditionalStmt";
-        case 129: return "elsePart";
-        case 130: return "ioStmt";
-        case 131: return "allVar";
-        case 132: return "arithmeticExpression";
-        case 133: return "expPrime";
-        case 134: return "term";
-        case 135: return "termPrime";
-        case 136: return "factor";
-        case 137: return "highPrecedenceOperators";
+        case 124: return "new_24";
+        case 125: return "funCallStmt";
+        case 126: return "outputParameters";
+        case 127: return "inputParameters";
+        case 128: return "iterativeStmt";
+        case 129: return "conditionalStmt";
+        case 130: return "elsePart";
+        case 131: return "ioStmt";
+        case 132: return "allVar";
+        case 133: return "arithmeticExpression";
+        case 134: return "expPrime";
+        case 135: return "term";
+        case 136: return "termPrime";
+        case 137: return "factor";
         case 138: return "lowPrecedenceOperators";
-        case 139: return "all";
-        case 140: return "temp";
-        case 141: return "booleanExpression";
-        case 142: return "var";
-        case 143: return "logicalOp";
-        case 144: return "relationalOp";
-        case 145: return "returnStmt";
-        case 146: return "optionalReturn";
-        case 147: return "idList";
-        case 148: return "more_ids";
-        case 149: return "new_24";
+        case 139: return "highPrecedenceOperators";
+        case 140: return "all";
+        case 141: return "temp";
+        case 142: return "booleanExpression";
+        case 143: return "var";
+        case 144: return "logicalOp";
+        case 145: return "relationalOp";
+        case 146: return "returnStmt";
+        case 147: return "optionalReturn";
+        case 148: return "idList";
+        case 149: return "more_ids";
+        case 150: return "newallvar";
+        case 151: return "allnew";
         default:
                 {
-                    char buf[12];
-                    sprintf(buf, "Nothing", f);
-                    return buf;
+                    
+                    return "Nothing";
                 }
     }
 }
-// returns token id for terminals
-int getColumnIndex(char* s)
-{
-    case : hashFun("TK_AND")  return 46;
-    case : hashFun("TK_ASSIGNOP")  return 1;
-    case : hashFun("TK_CALL")  return 42;
-    case : hashFun("TK_CL")  return 31;
-    case : hashFun("TK_COLON")  return 27;
-    case : hashFun("TK_COMMA")  return 56;
-    case : hashFun("TK_DIV")  return 41;
-    case : hashFun("TK_DOT")  return 28;
-    case : hashFun("TK_ELSE")  return 45;
-    case : hashFun("TK_END")  return 11;
-    case : hashFun("TK_ENDIF")  return 34;
-    case : hashFun("TK_ENDRECORD")  return 44;
-    case : hashFun("TK_ENDWHILE")  return 29;
-    case : hashFun("TK_EQ")  return 51;
-    case : hashFun("TK_FIELDID")  return 3;
-    case : hashFun("TK_FUNID")  return 7;
-    case : hashFun("TK_GE")  return 53;
-    case : hashFun("TK_GLOBAL")  return 17;
-    case : hashFun("TK_GT")  return 52;
-    case : hashFun("TK_ID")  return 4;
-    case : hashFun("TK_IF")  return 32;
-    case : hashFun("TK_INPUT")  return 22;
-    case : hashFun("TK_INT")  return 13;
-    case : hashFun("TK_LE")  return 50;
-    case : hashFun("TK_LIST")  return 19;
-    case : hashFun("TK_LT")  return 49;
-    case : hashFun("TK_MAIN")  return 16;
-    case : hashFun("TK_MINUS")  return 39;
-    case : hashFun("TK_MUL")  return 40;
-    case : hashFun("TK_NE")  return 54;
-    case : hashFun("TK_NOT")  return 48;
-    case : hashFun("TK_NUM")  return 5;
-    case : hashFun("TK_OP")  return 30;
-    case : hashFun("TK_OR")  return 47;
-    case : hashFun("TK_OUTPUT")  return 23;
-    case : hashFun("TK_PARAMETER")  return 18;
-    case : hashFun("TK_PARAMETERS")  return 10;
-    case : hashFun("TK_PLUS")  return 38;
-    case : hashFun("TK_READ")  return 35;
-    case : hashFun("TK_REAL")  return 14;
-    case : hashFun("TK_RECORD")  return 43;
-    case : hashFun("TK_RECORDID")  return 8;
-    case : hashFun("TK_RETURN")  return 37;
-    case : hashFun("TK_RNUM")  return 6;
-    case : hashFun("TK_SEM")  return 26;
-    case : hashFun("TK_SQL")  return 20;
-    case : hashFun("TK_SQR")  return 21;
-    case : hashFun("TK_THEN")  return 33;
-    case : hashFun("TK_TYPE")  return 15;
-    case : hashFun("TK_WHILE")  return 12;
-    case : hashFun("TK_WITH")  return 9;
-    case : hashFun("TK_WRITE")  return 36;
-    case : hashFun("eps") {return 57;}
-    case : hashFun("$")  return 55;
-    return -90;
+
+int getColumnIndex(char* string){
+
+	char* tokens[PTcols-1]= {"TK_ASSIGNOP", "TK_COMMENT", "TK_FIELDID", "TK_ID", "TK_NUM", "TK_RNUM", "TK_FUNID", "TK_RECORDID", "TK_WITH", "TK_PARAMETERS", 
+	"TK_END", "TK_WHILE", "TK_TYPE", "TK_MAIN", "TK_GLOBAL", "TK_PARAMETER", "TK_LIST", "TK_SQL", "TK_SQR", "TK_INPUT", "TK_OUTPUT", "TK_INT", "TK_REAL", "TK_COMMA",
+	 "TK_SEM", "TK_COLON", "TK_DOT", "TK_ENDWHILE", "TK_OP", "TK_CL", "TK_IF", "TK_THEN", "TK_ENDIF", "TK_READ", "TK_WRITE", "TK_RETURN", "TK_PLUS", "TK_MINUS", "TK_MUL", "TK_DIV",
+	  "TK_CALL", "TK_RECORD", "TK_ENDRECORD", "TK_ELSE", "TK_AND", "TK_OR", "TK_NOT", "TK_LT", "TK_LE", "TK_EQ", "TK_GT", "TK_GE", "TK_NE", "$"};
+
+	for(int i=0; i<PTcols-1; i++){
+		if(strcmp(string, tokens[i])==0)
+		{
+		  return i+1;
+		}
+		
+	}
+	return -1;
 }
+
+int getRowIndex(char* string){
+  char* nt[PTrows]= {"program", "mainFunction", "otherFunctions", "function", "input_par", "output_par", "parameter_list", "dataType", "primitiveDatatype",
+  "constructedDatatype","remaining_list","stmts","typeDefinitions","typeDefinition","fieldDefinitions","fieldDefinition","moreFields",
+  "declarations","declaration","global_or_not","otherStmts","stmt","assignmentStmt","singleOrRecId","new_24","funCallStmt","outputParameters","inputParameters",
+  "iterativeStmt","conditionalStmt","elsePart","ioStmt","allVar","arithmeticExpression","expPrime","term","termPrime","factor","lowPrecedenceOperators",
+  "highPrecedenceOperators","all","temp","booleanExpression","var","logicalOp","relationalOp","returnStmt","optionalReturn","idList","more_ids","newallvar","allnew"};
+  for(int i=0; i<PTrows; i++)
+  {
+    if(strcmp(string, nt[i])==0)
+    {
+      return i;
+    }
+  }
+  return -1;
+}
+
+
+parseTable createParseTable(hashtable ht,node* grules){
+
+	// parseTable pt;
+	parseTable pt=(parseTable)malloc(PTrows*sizeof(int*));
+
+	for(int i=0;i<PTrows;i++){
+		pt[i]=(int*)malloc(PTcols*sizeof(int));
+	}
+
+	for(int i=0;i<PTrows;i++){
+		for(int j=0;j<PTcols;j++){
+			pt[i][j]=-1;
+		}
+	}
+
+	node firstalpha;
+	
+	for(int i=0;i<Ngrammar;i++){
+		
+		
+		firstalpha=(node)malloc(Ngrammar*sizeof(struct Node));
+		firstalpha=getFirstAlpha(grules[i]->next, ht);
+    // printf("%d\n",i );
+    // printrule(firstalpha);
+
+		char* nonterminal=(char*)malloc(40*sizeof(char));
+		nonterminal=grules[i]->string;
+
+		node temp=firstalpha;
+		int eps=0,dollar=0;
+		while(temp!=NULL){
+			if(strcmp(temp->string,"eps")){
+				pt[getRowIndex(nonterminal)][getColumnIndex(temp->string)]=i;
+				
+			}
+			else{
+				eps=1;
+				node temp2= ht[hashcode(nonterminal)]->follow;
+				while(temp2!=NULL){
+				if(strcmp(temp2->string,"$")){
+					dollar=1;
+				}
+				pt[getRowIndex(nonterminal)][getColumnIndex(temp2->string)]=i;
+				temp2=temp2->next;
+				}
+
+			}
+			temp=temp->next;
+		}
+		if(eps==0){
+				node follow= ht[hashcode(nonterminal)]->follow;
+				node temp2 = follow;
+				while(temp2!=NULL){
+				if(strcmp(temp2->string,"$")){
+					dollar=1;
+				}
+				if(pt[getRowIndex(nonterminal)][getColumnIndex(temp2->string)]==-1)
+				pt[getRowIndex(nonterminal)][getColumnIndex(temp2->string)]=-2;
+				temp2=temp2->next;
+				}
+			}
+		if(dollar==1 && eps==1){
+			pt[getRowIndex(nonterminal)][getColumnIndex("$")]=i;
+		}
+
+		free(firstalpha);
+	}
+	return pt;
+}
+
+node getFirstAlpha(node rule, hashtable ht){//be careful while using this. first set ka first element is garbage. use first->next
+	node first=(node)malloc(sizeof(struct Node));
+	first->next=NULL;
+	node temp=rule;
+	while(temp!=NULL){
+    // printf("%s\n",temp->string );
+    // printrule(ht[hashcode(temp->string)]->first);
+		mergeLists(first,ht[hashcode(temp->string)]->first);
+    // printrule(first);
+		if(epsinFirst(temp,ht)){
+			temp=temp->next;
+			if(temp==NULL){
+				// printf("eps detected\n");
+				node temprandom=first->next;
+				node addeps=(node)malloc(sizeof(struct Node));
+				addeps->string = (char*)malloc(sizeof(char)*40);
+				strcpy(addeps->string,"eps");
+				//printf("%s\n",tempprev->next->string);
+				addeps->flag=0;
+				addeps->next=temprandom;
+				first->next=addeps;
+			}
+			//printf("%s\n",first->string );
+			continue;
+		}
+
+		break;
+		
+	}
+	return first->next;
+
+}
+
+void mergeLists(node list1,node list2){//copies second list into first without duplicates
+
+
+		node temp2=list2;
+		node temp;
+		node tempprev;
+		while(temp2!=NULL){
+			temp=list1;
+
+			int flag=0;
+			while(temp!=NULL){
+
+				if(!strcmp(temp->string,temp2->string)){
+					flag=1;
+					break;
+				}
+				tempprev=temp;
+				temp=temp->next;
+			}
+			if(flag==0 && strcmp(temp2->string,"eps")!=0 ){
+				tempprev->next=(node)malloc(sizeof(struct Node));
+				tempprev->next->string = (char*)malloc(sizeof(char)*40);
+				strcpy(tempprev->next->string,temp2->string);
+				//printf("%s\n",tempprev->next->string);
+				tempprev->next->flag=temp2->flag;
+				tempprev->next->next=NULL;
+
+			}
+			//printrule(list1);
+			temp2=temp2->next;
+		}
+
+
+		//printrule(list1);
+}
+
+
+int epsinFirst(node nonterminal,hashtable ht){
+	node temp=ht[hashcode(nonterminal->string)]->first;
+
+	while(temp!=NULL){
+		if(!strcmp(temp->string,"eps"))
+			return 1;
+		temp=temp->next;
+	}
+	return 0;
+}
+
+
+int stack_size = 10000;
+
+
+stack createStack(){
+    stack s = (stack) malloc(sizeof(struct Stack));
+    s->arr = (int*) malloc(sizeof(int)*stack_size);
+    s->top = -1;
+    return s;
+}
+
+void push(stack s, int rule_no, char* lable){
+	  // printf("Pushing Rule no: %d in %s\n", rule_no, lable);
+    s->top = s->top +1 ;
+    if(s->top==stack_size) printf("Stack size reached %d\n", s->top);
+    s->arr[s->top] = rule_no;
+}
+
+int getTop(stack s){
+    return s->arr[s->top];
+}
+
+
+int pop(stack s, char* lable){
+    int d = s->arr[s->top];
+    s->top = s->top - 1;
+	  // printf("Popping Rule no: %d From %s\n", d, lable);
+    return d;
+}
+
+
+int isEmpty(stack s){
+    if(s->top == -1) return 1;
+    return 0;
+}
+
+treenode createTreeNode(char *a, int Id, char* lexeme){
+    treenode newNode = (treenode) malloc(sizeof(struct TreeNode)); 
+    
+    newNode->children = NULL;
+    newNode->next = NULL;
+    newNode->parent = NULL;
+    newNode->prev = NULL;
+
+    newNode -> lexeme = (char*) malloc(sizeof(char)*30);
+
+    newNode -> id = Id;
+    return newNode;
+}
+
+
+int isFollow(int X, int ip,hashtable ht){
+
+  node follow =ht[hashcode(getCorrespondingString(X))]->follow;
+  while(follow!=NULL){
+    if(ip==getId(follow->string)){
+      return 1;
+    }
+    follow=follow->next;
+  }
+    //add if (X is a terminal ) return 1; stmt.
+
+    return 0;
+}
+/*nonLeafNode* createNonLeafNode(){
+    return (nonLeafNode) malloc(sizeof(struct NonLeafNode)); 
+}
+leafNode* createLeafNOde(){
+    return (leafNode) malloc(sizeof(struct LeafNode)); 
+}
+*/
+void printStack(stack s){
+  //int end = getTop(s);
+  printf("printing stack:\n");
+  while(!isEmpty(s)){
+
+    printf("%d \n", pop(s,"sdf"));
+  }
+  exit(0);
+}
+void printTree(treenode t){
+    printf("%s ==> ",t->lexeme);
+    treenode temp = t->children;
+    while(temp!=NULL) {
+        printf("%s,",temp->lexeme);
+        temp = temp -> next;
+    }
+    printf("\n");
+    treenode temp2 = t->children;
+    while(temp2!=NULL) {
+        printTree(temp2);
+        temp2 = temp2 -> next;
+    }
+    return;
+}
+
+treenode parseInputSourceCode(FILE* fp, parseTable pTable, node* gRules, tokenInfo token, char*buffer, int bsize, hashtable ht,int* error){
+   // FILE* fp=fopen("Testcases/testcase2.txt","r");
+    if (fp==NULL) 
+        {
+            fputs ("File error",stderr);
+            exit (1);
+        }
+  
+   // printf("Token: %s\n",token.value);
+
+    while(strcmp(token.value,"%")==0){
+      token = getNextToken(fp,buffer,bsize);
+    }
+    int ip = token.tokenId;
+
+    stack s = createStack();
+
+    push(s, 54, "Stack1");
+    push(s, 100, "Stack1");
+
+    treenode t_head = createTreeNode("program",100, "program");
+    treenode t_ptr = t_head;
+
+    int X = getTop(s); 
+
+    do{  // (X != $ )
+    // printf("rule no For X = %d , ip = %d ,line no: %d : %d\n", X, ip,token.line, pTable[X%100][ip]);
+        if(X==ip) {
+            int t = pop(s, "Stack1");
+            //t_ptr = t_ptr->parent;
+            //t_ptr->lexeme = (char)
+            strcpy(t_ptr->lexeme,token.value);
+            t_ptr->line = token.line;
+
+            token = getNextToken(fp,buffer,bsize);
+            // printf("buffer %s offset %d\n",buffer,offset );
+            while(strcmp(token.value,"%")==0){
+              token = getNextToken(fp,buffer,bsize);
+            }
+            ip = token.tokenId;
+
+//Uncomment this
+
+            //Go to parent ya right
+            while(t_ptr->next == NULL){
+                if(t_ptr==t_head){
+                    return t_head;
+                }
+                t_ptr = t_ptr -> parent;
+            }
+            t_ptr = t_ptr -> next;
+			//printf("t_ptr %s", t_ptr->lexeme);
+	    
+
+    }
+
+        else if(X<100){ //terminal terminal clash
+             //errorTerminal(X, ip);
+            // move tree pointer up.
+
+         pop(s, "error");
+             while(t_ptr->next == NULL){
+                if(t_ptr==t_head){
+                    return t_head;
+                }
+                t_ptr = t_ptr -> parent;
+              }
+            t_ptr = t_ptr -> next;
+            *error=1;
+            printf("Line No:%d The token %s for lexeme %s  does not match with the expected token %s\n", token.line, getCorrespondingString(ip), token.value,getCorrespondingString(X));
+          
+
+          }
+        else if(pTable[X%100][ip] == -1){
+           //Error
+          //printTree(t_head);
+          while(pTable[X%100][ip]==-1){
+               token = getNextToken(fp,buffer,bsize);
+               ip = token.tokenId;
+          }
+
+          if(isFollow(X,ip, ht)==1){
+                pop(s,"error");
+             while(t_ptr->next == NULL){
+                if(t_ptr==t_head){
+                    return t_head;
+                }
+                t_ptr = t_ptr -> parent;
+              }
+            t_ptr = t_ptr -> next;
+
+          }   *error=1;
+              printf("Line No: %d Error: Invalid token %s encountered with value %s stack top %s\n",token.line, getCorrespondingString(ip), token.value, getCorrespondingString(X));
+         
+        }
+        else if(pTable[X%100][ip] == -2){
+            //Sync
+            //printStack(s);
+            pop(s,"compiler");
+             while(t_ptr->next == NULL){
+                if(t_ptr==t_head){
+                    return t_head;
+                }
+                t_ptr = t_ptr -> parent;
+            }
+            t_ptr = t_ptr -> next;
+              *error=1;
+              printf("Line No: %d Error: Invalid token %s encountered with value %s stack top %s\n",token.line, getCorrespondingString(ip), token.value, getCorrespondingString(X));
+                     
+
+
+        }
+        else {
+            int rule_id = pTable[X%100][ip];
+
+            node rule = gRules[rule_id];
+
+            //Insert Rule in parse Tree.
+            rule = rule -> next;
+            //printrule(rule);
+            if(strcmp(rule->string,"eps")!=0){
+                t_ptr->children = (treenode) malloc(sizeof(struct TreeNode));
+				        t_ptr->children =  addChildrenRule(t_ptr,rule,token.line, token.value);
+                //printf("Added to parent: %s\n",t_ptr->lexeme);
+                t_ptr=t_ptr->children;
+                //printf("T_ptr now: %s\n",t_ptr->lexeme);
+
+                //pop the stack.
+                pop(s, "Stack1");
+
+                stack temp_stack = createStack(); 
+                //push in dummy stack;
+                node temp = rule;
+                while(temp!=NULL){
+					//printf("Calling!...\n");
+                    int temp_id = getId(temp->string);
+					//printf("id getting here for %s-> %d \n", temp->string, temp_id);
+                    push(temp_stack, temp_id, "Stack2");
+					         temp = temp->next;
+                }
+                while(!isEmpty(temp_stack)){
+                    push(s, pop(temp_stack, "Stack2"), "Stack1");
+                }
+			//printf("out\n");
+            }
+
+            else{
+                //handle eps.
+                while(t_ptr->next == NULL){
+                if(t_ptr==t_head){
+                    return t_head;
+                }
+                t_ptr = t_ptr -> parent;
+            }
+            t_ptr = t_ptr -> next;
+                pop(s, "Stack1");
+            }
+
+        }
+        X = getTop(s);
+    }while(X!=54);
+
+    
+    return t_head;
+}
+
+void printParseTree(treenode pTree, FILE* fp)
+{
+  /*char term[15];
+  char lexemeCurrentNode[20];
+  int lineNo;
+  char token[20];
+  char parentNodeSym[20];
+  char value[20];
+  char nodeSymbol[20];
+  char isLeaf[4];*/
+
+  if(pTree != NULL){
+    printParseTree(pTree->children, fp);
+    //strcpy(term ,getCorrespondingString(pTree->id));
+    
+    char value[40]="N/A";
+    if(pTree!=NULL && pTree->id <100) {
+      if(pTree->id==6||pTree->id==5)
+          strcpy(value,pTree->lexeme);
+              // fprintf(fp,"LEXEME:%s\tLINE NO:%d\tTOKEN:%s\tVALUE:%s\tPARENT NODE:%s\tISLEAF():%s\tNODE SYMBOL:%s\n", pTree->lexeme, pTree->line, getCorrespondingString(pTree->id),value,getCorrespondingString(pTree->parent->id),"yes","\t" );      
+          fprintf(fp,"%15s %6d %19s %15s %25s %8s %18s\n", pTree->lexeme, pTree->line, getCorrespondingString(pTree->id),value,getCorrespondingString(pTree->parent->id),"yes","\t" );      
+
+    
+    } 
+    else {
+      if(pTree!=NULL && pTree->id==100)
+        fprintf(fp,"%15s %6d %19s %15s %25s %8s %18s\n", "----", pTree->line, "\t",value,"ROOT","no",getCorrespondingString(pTree->id) );
+      else
+        fprintf(fp,"%15s %6d %19s %15s %25s %8s %18s\n", "----", pTree->line, "\t",value,getCorrespondingString(pTree->parent->id),"no",getCorrespondingString(pTree->id) );
+    }
+
+
+    //printf("%-15s%-6d%-22s%-22s%-26s%-6s%-22s\n",lexemeCurrentNode, lineNo, token,value,parentNodeSym,isLeaf,nodeSymbol);
+    //fprintf(outfp,"%-15s%-6d%-22s%-22s%-26s%-6s%-22s\n",lexemeCurrentNode, lineNo, token,value,parentNodeSym,isLeaf,nodeSymbol);
+    if(pTree->children != NULL)
+    {
+      if(pTree->children->next != NULL)
+      {
+        treenode temp = pTree->children->next;
+        while(temp != NULL)
+        {
+          printParseTree(temp, fp);
+          temp = temp->next;
+        } 
+      }
+    }
+  }
+}
+
+
+
+treenode addChildrenRule(treenode parent,node n, int line, char*lexeme){
+    //printf("Inserting children of %s \n",parent->lexeme);
+    //printrule(n);
+
+    node temp = n;
+    
+    treenode head = createTreeNode(n->string,getId(n->string), lexeme);
+    //if(head->line==0)
+    head-> line = line;
+    head->next = NULL;
+    treenode t = head;
+    head->parent = parent;
+    n = n->next;
+    treenode temp2;
+    while(n!=NULL){
+      t->next = createTreeNode(n->string,getId(n->string), lexeme);
+      t->next->line = line;
+      t->next->next = NULL;
+      t->next->parent=parent; 
+      n = n->next;
+      //temp = t;
+      t = t->next;
+    }
+    //t=NULL;
+    return head;
+}
+
+int getId(char* string)
+{
+	int i;
+  if(string[0]>='A' && string[0]<='Z')
+    i =  getColumnIndex(string);
+  else
+    i = getRowIndex(string)+100;
+
+//printf("%s -> %d \n",string, i );
+return i;
+}
+
+
+
+
+void printInorderTraversal(treenode tree,char* outputFileName){
+  FILE* fp=fopen(outputFileName,"w");
+  inorder(tree,fp);
+}
+
+void inorder(treenode tree,FILE* fp){
+  if(tree==NULL)
+    return;
+  inorder(tree->children,fp);
+  fprintf(fp,"\n");
+  fprintf(fp,"%s ",getCorrespondingString(tree->id));
+  if(tree->children == NULL) {
+    return;
+  }
+  treenode temp = tree->children->next;
+  while(temp!=NULL){
+      inorder(temp,fp);
+      temp = temp->next;
+  }
+  fclose(fp);
+}
+
+
+
