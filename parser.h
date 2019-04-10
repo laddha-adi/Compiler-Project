@@ -47,4 +47,6 @@ int getId(char* str);
 void printInorderTraversal(treenode tree,char* outputFileName);
 void inorder(treenode tree,FILE* fp);
 void printParseTree(treenode pTree, FILE* fp);
+void printTree(treenode t);
+
 #endif

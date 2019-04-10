@@ -652,11 +652,13 @@ void printStack(stack s){
   }
   exit(0);
 }
+
 void printTree(treenode t){
-    printf("%s ==> ",t->lexeme);
+    printf("%s ==> ",getCorrespondingString(t->id));
     treenode temp = t->children;
+    if(temp==NULL) printf("(null)");
     while(temp!=NULL) {
-        printf("%s,",temp->lexeme);
+        printf("%s,",getCorrespondingString(temp->id));
         temp = temp -> next;
     }
     printf("\n");

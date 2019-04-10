@@ -10,6 +10,8 @@ ADITYA LADDHA 2016A7PS0038P
 #include "parser.h"
 #include "lexer.h"
 #include <time.h>
+#include "ast.h"
+#include "symboltable.h"
 
 void printOptions(){
 	printf("\n");
@@ -19,6 +21,9 @@ void printOptions(){
 	printf("Press 2 to print the token list\n");
 	printf("Press 3 to check for syntactic correctness of the input source code\n");
 	printf("Press 4 to print the total time taken by lexer and parser\n");
+	printf("Press 5 to print parse tree.\n");
+	printf("Press 6 to create AST tree.\n");
+
 	printf("Select an option: ");
 }
 
@@ -124,7 +129,7 @@ int main (int argc, char* argv[]){
 	
 	input = (int)str[0]-'0';
 
-	if(input>=0 && input<=4){
+	if(input>=0 && input<=7){
 	switch (input){
 		case 0:
 			exit(0);
@@ -164,8 +169,32 @@ int main (int argc, char* argv[]){
             total_CPU_time  =  (double) (end_time - start_time);
             total_CPU_time_in_seconds =   total_CPU_time / CLOCKS_PER_SEC;
             printf("Total CPU time = %f \nTotal CPU time in seconds %f\n",total_CPU_time, total_CPU_time_in_seconds);
+			break;	
+		case 5:
+			printf("Parse Tree...\n");
+			if(fp==NULL) printf("file pointer error");
+			treenode tree2 = runLexerAndParser(fp, parseTreeOutputFile, gRules, ht,pt); 
+			//tree2=createAST(tree2);
+			printTree(tree2);
 			break;	 
 
+		case 6:
+			printf("AST...\n");
+			if(fp==NULL) printf("file pointer error");
+			treenode tree3= runLexerAndParser(fp, parseTreeOutputFile, gRules, ht,pt); 
+			tree2=createAST(tree3);
+			printTree(tree3);
+			break;	 
+
+		case 7:
+			if(fp==NULL) printf("file pointer error");
+			treenode tree4= runLexerAndParser(fp, parseTreeOutputFile, gRules, ht,pt); 
+			tree4=createAST(tree4);
+			variable globalList;
+			printf("######## STARTING SYMBOL TABLE CREATION ########\n");
+			findAndInsertGVariables(globalList, tree4);
+			break;
+			
 		default:
 			printf("Invalid input\n");
 			break;
