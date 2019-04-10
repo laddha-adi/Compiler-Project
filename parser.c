@@ -535,7 +535,7 @@ void mergeLists(node list1,node list2){//copies second list into first without d
 
 			int flag=0;
 			while(temp!=NULL){
-
+        if(temp->string!=NULL && temp2->string!=NULL)
 				if(!strcmp(temp->string,temp2->string)){
 					flag=1;
 					break;
