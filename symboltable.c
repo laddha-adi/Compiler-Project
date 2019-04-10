@@ -13,7 +13,7 @@ symbolTable create(){
 	return st;
 }
 
-recordTable create(){
+recordTable createRT(){
 	recordTable st = (recordTable)malloc(sizeof(record)*size);
 	int i = 0;
 	while(i<size){
@@ -23,10 +23,10 @@ recordTable create(){
 	return st;
 }
 
-recordTable insertToRT(){
-	
-}
+/*recordTable insertToRT(recordTable rt, treenode){
 
+}
+*/
 int hash(char *str){
 	unsigned long int hashvalue = 6669;
 	int i = 0;
@@ -165,7 +165,6 @@ variable createVar(treenode declaration, char* scope){
 			temp->offset = offset;
 			offset = offset+ temp->width;
 		}
-	temp->rfields = NULL;
 	temp->lineno = declaration->line;
 	return temp;
 }
@@ -200,32 +199,95 @@ void findAndInsertGVariables(variable globalVarList, treenode root){
 	//t : declaration ==>  TK_INT, TK_ID, global_or_not.
 	//OR , 			  ==>  TK_REAL, TK_ID, global_or_not
 
-	//FROM Main: 
-	treenode declarations = root->children->next->children->children->next;
-	if(declarations->children==NULL) return;
-	treenode declaration = declarations->children;
-	//printTree(declarations);
 
-	while(declaration!=NULL){
-		//printf("1\n");
-		//printTree(declaration);
-		if(declaration->children->next->next->children != NULL){ //if child of global_or_not is not NULL
-		//	printf("2\n");
-			if(searchInGlobalList(globalVarList, declaration->children->next->lexeme)==1){
-				printf("ERROR: Global Var %s already declared\n", declaration->children->next->lexeme);
-			}
-			else
-				globalVarList = addToGlobalList(globalVarList, declaration);
-		//	printf("3\n");
+
+	treenode functions = root->children;
+	treenode stmt, declarations;
+	while(functions!=NULL){
+		if(functions->next!=NULL){
+			stmt = functions->children->next->next->next;
 		}
-		//printf("BEF Next\n");
-		declaration = declaration -> next;
-		//printf("After Next\n");
+		else{
+			stmt = functions->children; 
+		}
+		declarations = stmt->children->next;
+		if(declarations->children==NULL) return;
+		treenode declaration = declarations->children;
+
+		while(declaration!=NULL){
+			if(declaration->children->next->next->children != NULL){ //if child of global_or_not is not NULL
+				if(searchInGlobalList(globalVarList, declaration->children->next->lexeme)==1){
+					printf("ERROR: Global Var %s already declared\n", declaration->children->next->lexeme);
+				}
+				else
+					globalVarList = addToGlobalList(globalVarList, declaration);
+			}
+			declaration = declaration -> next;
+		}
+		functions = functions->next;
 	}
-
-
 }
 
+recordField createRecordField(treenode fieldDef){
+	recordField newField = (recordField) malloc(sizeof(struct recordfields));
+	newField->type = fieldDef->children->id; 
+	newField->lexeme = (char*) malloc(sizeof(char)*30);
+	strcpy(newField->lexeme,fieldDef->children-> next->lexeme);
+	if(newField->type == 22) {
+		newField->width = 2;
+	}else if(newField->type == 23){
+		newField->width = 4;
+	}
+	newField->next = NULL; 
+}
+
+recordVar createRecordVar(treenode typeDef, recordVar recordList){
+	recordVar newVar = (recordVar)malloc(sizeof(struct record));
+	newVar->rname = (char*) malloc(sizeof(char)*30);
+	newVar->width = 0;
+	newVar->head = NULL; 
+	newVar->lineno = typeDef-> children->line;
+	strcpy(newVar->rname,typeDef->children-> lexeme);
+	newVar->next = NULL;
+
+	treenode fieldDef = typeDef->children->next->children;
+	recordField newField = createRecordField(fieldDef);
+	newVar->width += newField->width;
+	newVar -> head = newField;
+	recordField temp = newVar->head;
+	while(fieldDef!=NULL){
+		temp->next = createRecordField(fieldDef);
+		temp = temp->next;
+		newField->width += temp->width;
+		fieldDef = fieldDef->next;
+	}
+	return newVar;
+}
+
+recordVar addToRecordList(recordVar list, treenode declaration ){
+	printf("Adding : %s to Record list\n", declaration->children->next->lexeme);
+	variable newVar = createVar(declaration, "global");
+	if(list==NULL) return newVar; 
+	variable temp = list;
+	while(temp->next!=NULL){
+		temp = temp->next;
+	}
+	temp->next = newVar;
+	return list;
+}
+
+int searchInRecordList(recordVar list, char* lex){
+			//printf("Entry\n");
+
+	recordVar temp = list;
+	while(temp!=NULL){
+		if(temp->rname !=NULL && lex!=NULL && strcmp(temp->rname,lex)==0) return 1;
+		temp = temp->next;
+	}
+			//printf("Exit\n");
+
+	return 0;
+}
 
 
 

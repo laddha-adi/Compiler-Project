@@ -186,6 +186,7 @@ treenode createAST(treenode parseTree){
 					while(child->next->id!=102)
 						child=child->next;
 					child->next = NULL;
+					createAST(currentnode->children);
 					break;
 
 			case 110://remlist   : collapse this special case
@@ -370,7 +371,7 @@ treenode createAST(treenode parseTree){
 					createAST(child->next);
 					break;
 			case 7://funid copy
-					temp=currentnode->next;
+					/*temp=currentnode->next;
 					parent=currentnode->parent;
 					if(parent->id==104){//function
 						copynode(currentnode,parent);
@@ -379,7 +380,13 @@ treenode createAST(treenode parseTree){
 					}
 					
 					createAST(temp);
-					break;
+					break;*/
+				currentnode ->parent ->parent->children = currentnode;
+				temp = currentnode->parent;
+				currentnode->parent = currentnode ->parent ->parent;
+				free(temp);
+				createAST(currentnode->next);
+				break;
 			
 			case 34://read copy to iostmt
 			case 35://write   copy to iostmt
@@ -508,8 +515,7 @@ treenode createAST(treenode parseTree){
 	return(parseTree);
 }
 			
-	/*		
-
+/*
 treenode runLexerAndParser(FILE* fp, node* gRules, hashtable ht, parseTable pTable){
 	
     if(ht==NULL) ht=createHashTable();
@@ -532,7 +538,7 @@ treenode runLexerAndParser(FILE* fp, node* gRules, hashtable ht, parseTable pTab
    	lineNo=1;
    	return w;
    //printTree(w);
-}*/
+}
 	/*	
 	int main (int argc, char* argv[]){
 	int input;

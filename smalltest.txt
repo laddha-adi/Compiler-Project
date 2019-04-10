@@ -1,7 +1,21 @@
+_sumN  input parameter list [int d5cc34]  
+output parameter list[real d3];
+	record #marks
+		type real : maths; 
+		type real: physics; 
+		type real: chemistry;
+	endrecord;
+	return [d3];
+end
 
 _main
+
+	record #marks
+		type real : maths; 
+		type real: physics; 
+		type real: chemistry;
+	endrecord;
+
 	type int :b3 :global;
-	type int :b4 :global;
-	type real :c4bd56;
 	return;
 end
