@@ -1,7 +1,7 @@
 
 _main
 	type int :b3 :global;
-	%type int :b4 :global;
-	%type real :c4bd56;
+	type int :b4 :global;
+	type real :c4bd56;
 	return;
 end

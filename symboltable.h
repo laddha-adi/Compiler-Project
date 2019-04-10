@@ -28,12 +28,15 @@ int error_count;
 
 int symbolerror;
 
-variable createVar(treenode declaration);
-
+variable createVar(treenode declaration, char* scope);
 variable addToGlobalList(variable list, treenode declaration);
 int searchInGlobalList(variable list, char* lex);
-
-//Function to find and add Globla Var to Global Var list.
 void findAndInsertGVariables(variable globalVarList, treenode root);
+symbolTable create();
+int hash(char *str);
+symbolTable insert(char* scope, variable var, int typeList, symbolTable stable);
+variable lookupSTable(variable var, char*scope, symbolTable stable, variable globalVarList);
+variable insertAtEnd(variable list,variable var);
+int searchInList(variable var, variable list);
 
 #endif

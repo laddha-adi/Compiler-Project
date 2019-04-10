@@ -3,29 +3,37 @@
 typedef struct variable* variable;
 struct recordfields;
 typedef struct recordfields* recordfields;
+typedef struct symbolTable** symbolTable;
+typedef struct record** recordTable;
+typedef struct record* record;
+
 
 struct variable{
-	char* type;
+	int type;
 	char* lexeme;
 	int width;
 	int offset;
 	char* scope;
 	variable next; 
-	recordfields rfields;
 	int lineno;
 }; 
 
+
+
 struct recordfields{
-	char* type;
+	int type;
 	char* lexeme;
 	int width;
-	int offset;
-	char* scope;
-	recordfields* next; 
+	recordfields next; 
+}; 
+
+struct record{
+	char* rname;
+	int width;
+	recordfields head; 
 	int lineno;
 };
 
-struct symbolTable** symbolTable;
 
 struct symbolTable{
 	char* scope;
