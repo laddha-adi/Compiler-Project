@@ -10,7 +10,7 @@ end
 
 _main
 
-	record #marks
+	record #marksofsahil
 		type real : maths; 
 		type real: physics; 
 		type real: chemistry;

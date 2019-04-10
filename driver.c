@@ -193,6 +193,9 @@ int main (int argc, char* argv[]){
 			variable globalList;
 			printf("######## STARTING SYMBOL TABLE CREATION ########\n");
 			findAndInsertGVariables(globalList, tree4);
+			printf("######## ADDING RECORD DEFS########\n");
+			recordVar globalRecordDefList;
+			findAndInsertRecordDefs(globalRecordDefList, tree4);
 			break;
 			
 		default:

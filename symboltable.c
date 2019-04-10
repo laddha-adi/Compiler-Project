@@ -13,7 +13,7 @@ symbolTable create(){
 	return st;
 }
 
-recordTable createRT(){
+/*recordTable createRT(){
 	recordTable st = (recordTable)malloc(sizeof(record)*size);
 	int i = 0;
 	while(i<size){
@@ -22,7 +22,7 @@ recordTable createRT(){
 	}
 	return st;
 }
-
+*/
 /*recordTable insertToRT(recordTable rt, treenode){
 
 }
@@ -150,7 +150,7 @@ int searchInList(variable var, variable list){
 variable createVar(treenode declaration, char* scope){
 	variable temp = (variable)malloc(sizeof(struct variable));
 	temp -> lexeme = (char*)malloc(sizeof(char)*50); 
-	strcpy(temp->lexeme,declaration -> lexeme);
+	strcpy(temp->lexeme,declaration ->children -> next-> lexeme);
 	temp->next = NULL;
 	//temp->type = (char*)malloc(sizeof(char)*20);
 	temp->type = declaration->children->id;
@@ -198,31 +198,58 @@ int searchInGlobalList(variable list, char* lex){
 void findAndInsertGVariables(variable globalVarList, treenode root){
 	//t : declaration ==>  TK_INT, TK_ID, global_or_not.
 	//OR , 			  ==>  TK_REAL, TK_ID, global_or_not
-
-
+		//printf("-1\n");
 
 	treenode functions = root->children;
 	treenode stmt, declarations;
+
 	while(functions!=NULL){
-		if(functions->next!=NULL){
+		if(functions->children==NULL)
+			{functions=functions->next;
+			continue;}
+		if(functions->next!=NULL && functions->children!=NULL){
+			//Function is otherFunctions here.
+					//printf("0\n");
+
 			stmt = functions->children->next->next->next;
 		}
 		else{
+
+			//Function is main here.
+			//printf("%d\n", functions->id);
 			stmt = functions->children; 
+								//printf("Nikki\n");
+
 		}
+		//printf("kaun h ye %d\n", stmt->id);
 		declarations = stmt->children->next;
-		if(declarations->children==NULL) return;
+		if(declarations==NULL) {
+		//	printf("Sahil's lol\n");
+		}
+		//printTree(declarations);
+		//printf("1\n");
+		if(declarations->children==NULL) 
+			{	functions=functions->next;
+				continue;}
 		treenode declaration = declarations->children;
+		//printf("2\n");
 
 		while(declaration!=NULL){
+		//printf("3\n");
+			
 			if(declaration->children->next->next->children != NULL){ //if child of global_or_not is not NULL
 				if(searchInGlobalList(globalVarList, declaration->children->next->lexeme)==1){
 					printf("ERROR: Global Var %s already declared\n", declaration->children->next->lexeme);
 				}
 				else
+		//printf("4\n");
 					globalVarList = addToGlobalList(globalVarList, declaration);
+		//printf("5\n");
+
 			}
 			declaration = declaration -> next;
+		//printf("6\n");
+
 		}
 		functions = functions->next;
 	}
@@ -241,7 +268,7 @@ recordField createRecordField(treenode fieldDef){
 	newField->next = NULL; 
 }
 
-recordVar createRecordVar(treenode typeDef, recordVar recordList){
+recordVar createRecordVar(treenode typeDef){
 	recordVar newVar = (recordVar)malloc(sizeof(struct record));
 	newVar->rname = (char*) malloc(sizeof(char)*30);
 	newVar->width = 0;
@@ -264,31 +291,73 @@ recordVar createRecordVar(treenode typeDef, recordVar recordList){
 	return newVar;
 }
 
-recordVar addToRecordList(recordVar list, treenode declaration ){
-	printf("Adding : %s to Record list\n", declaration->children->next->lexeme);
-	variable newVar = createVar(declaration, "global");
-	if(list==NULL) return newVar; 
-	variable temp = list;
-	while(temp->next!=NULL){
-		temp = temp->next;
+recordVar addToRecordList(recordVar list, treenode typeDefs){
+	treenode typeDef = typeDefs->children;
+
+	while(typeDef!=NULL){
+		if(searchInRecordList(list, typeDef->children->lexeme)==1){
+			printf("ERROR: Record Def %s already declared\n", typeDef->children->lexeme);
+			return list;
+		}
+		else{
+			recordVar newVar = createRecordVar(typeDef);
+			printf("Adding : %s to Record list\n", typeDef->children->lexeme);
+
+			newVar -> next = list;
+			list = newVar;
+		}
+		typeDef = typeDef->next;
 	}
-	temp->next = newVar;
 	return list;
 }
 
 int searchInRecordList(recordVar list, char* lex){
-			//printf("Entry\n");
 
 	recordVar temp = list;
 	while(temp!=NULL){
 		if(temp->rname !=NULL && lex!=NULL && strcmp(temp->rname,lex)==0) return 1;
 		temp = temp->next;
 	}
-			//printf("Exit\n");
-
 	return 0;
 }
 
+
+
+void findAndInsertRecordDefs(recordVar globalRecordDefList, treenode root){
+	//t : declaration ==>  TK_INT, TK_ID, global_or_not.
+	//OR , 			  ==>  TK_REAL, TK_ID, global_or_not
+
+	treenode functions = root->children;
+	treenode stmt, typeDefs;
+	while(functions!=NULL){
+		if(functions->children==NULL)
+			{functions=functions->next;
+			continue;}
+		if(functions->next!=NULL){
+			stmt = functions->children->next->next->next;
+		}
+		else{
+			stmt = functions->children; 
+		}
+		typeDefs = stmt->children;
+		globalRecordDefList = addToRecordList(globalRecordDefList,typeDefs);
+
+		/*if(typeDefs->children==NULL) return;
+		treenode typeDef = typeDefs->children;
+
+		while(typeDef!=NULL){
+			if(typeDef->children->next->next->children != NULL){ //if child of global_or_not is not NULL
+				if(searchInGlobalList(globalVarList, typeDef->children->next->lexeme)==1){
+					printf("ERROR: Global Var %s already declared\n", typeDef->children->next->lexeme);
+				}
+				else
+					globalVarList = addToGlobalList(globalVarList, declaration);
+			}
+			declaration = declaration -> next;
+		}*/
+		functions = functions->next;
+	}
+}
 
 
 

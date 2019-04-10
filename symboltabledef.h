@@ -2,7 +2,7 @@
 
 typedef struct variable* variable;
 struct recordfields;
-typedef struct recordfields* recordfield;
+typedef struct recordfields* recordField;
 typedef struct symbolTable** symbolTable;
 typedef struct record** recordTable;
 typedef struct record* recordVar;
@@ -24,13 +24,13 @@ struct recordfields{
 	int type;
 	char* lexeme;
 	int width;
-	recordfield next; 
+	recordField next; 
 }; 
 
 struct record{
 	char* rname;
 	int width;
-	recordfield head; 
+	recordField head; 
 	int lineno;
 	recordVar next;
 };

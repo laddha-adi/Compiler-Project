@@ -38,5 +38,16 @@ symbolTable insert(char* scope, variable var, int typeList, symbolTable stable);
 variable lookupSTable(variable var, char*scope, symbolTable stable, variable globalVarList);
 variable insertAtEnd(variable list,variable var);
 int searchInList(variable var, variable list);
-recordVar createRecordVar(treenode typedef);
+recordVar createRecordVar(treenode typeDef);
+
+
+recordField createRecordField(treenode fieldDef);
+recordVar createRecordVar(treenode typeDef);
+recordVar addToRecordList(recordVar list, treenode typeDefs);
+int searchInRecordList(recordVar list, char* lex);
+void findAndInsertRecordDefs(recordVar globalRecordDefList, treenode root);
+
+
+
+
 #endif
