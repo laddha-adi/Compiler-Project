@@ -29,9 +29,9 @@ int error_count;
 int symbolerror;
 
 variable createVar(treenode declaration, char* scope);
-variable addToGlobalList(variable list, treenode declaration);
+variable addToGlobalList(variable list, treenode declaration, char* scope);
 int searchInGlobalList(variable list, char* lex);
-void findAndInsertGVariables(variable globalVarList, treenode root);
+variable findAndInsertGVariables(variable globalVarList, treenode root, recordVar globalRecordDefList);
 symbolTable create();
 int hash(char *str);
 symbolTable insert(char* scope, variable var, int typeList, symbolTable stable);
@@ -40,14 +40,20 @@ variable insertAtEnd(variable list,variable var);
 int searchInList(variable var, variable list);
 recordVar createRecordVar(treenode typeDef);
 
-
 recordField createRecordField(treenode fieldDef);
 recordVar createRecordVar(treenode typeDef);
 recordVar addToRecordList(recordVar list, treenode typeDefs);
 int searchInRecordList(recordVar list, char* lex);
-void findAndInsertRecordDefs(recordVar globalRecordDefList, treenode root);
+recordVar findAndInsertRecordDefs(recordVar globalRecordDefList, treenode root, recordVar head);
+void findAndInsertGRecVariables(variable globalVarList, treenode root, recordVar rlist);
 
-
-
+void printRecordDefList(recordVar head);
+symbolTable addFunctions(treenode root, variable globalVarList, recordVar recordDefList);
+variable addToVariableList(variable list, variable v);
+void printVarList(variable head);
+symbolTableElement createMainFunction(treenode function, symbolTable stable, variable globalVarList, recordVar recordDefList);
+void printSymbolTable(symbolTable stable);
+void addOffset(symbolTable stable, recordVar recordDefList);
+void addListOffset(variable head, recordVar recordDefList);
 
 #endif

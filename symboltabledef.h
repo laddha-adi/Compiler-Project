@@ -6,7 +6,7 @@ typedef struct recordfields* recordField;
 typedef struct symbolTable** symbolTable;
 typedef struct record** recordTable;
 typedef struct record* recordVar;
-
+typedef struct symbolTable* symbolTableElement;
 
 struct variable{
 	int type;
@@ -16,6 +16,7 @@ struct variable{
 	char* scope;
 	variable next; 
 	int lineno;
+	char* recordName;
 }; 
 
 

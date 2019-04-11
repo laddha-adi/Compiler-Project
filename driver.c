@@ -190,12 +190,39 @@ int main (int argc, char* argv[]){
 			if(fp==NULL) printf("file pointer error");
 			treenode tree4= runLexerAndParser(fp, parseTreeOutputFile, gRules, ht,pt); 
 			tree4=createAST(tree4);
-			variable globalList;
+			variable globalList, globalVarHead;
 			printf("######## STARTING SYMBOL TABLE CREATION ########\n");
-			findAndInsertGVariables(globalList, tree4);
-			printf("######## ADDING RECORD DEFS########\n");
-			recordVar globalRecordDefList;
-			findAndInsertRecordDefs(globalRecordDefList, tree4);
+			printf("\n######## ADDING RECORD DEFS########\n");
+			recordVar globalRecordDefList, head;
+			head = findAndInsertRecordDefs(globalRecordDefList, tree4, head);
+printf("\n====================================\n");
+			head = head->next;
+			printRecordDefList(head);
+printf("\n====================================\n");
+
+			printf("\n######## ADDING GLOBAL VARS########\n");
+			globalVarHead = findAndInsertGVariables(globalList, tree4, head);
+
+printf("\n====================================\n");
+			printVarList(globalVarHead);
+printf("\n====================================\n");
+			//findAndInsertGRecVariables(globalList, tree4, globalRecordDefList);
+			printf("\n######## ADDING FUNCTIONS AND LOCAL VARS########\n");
+ 			symbolTable stable;
+ 			stable = addFunctions(tree4,globalVarHead,head);
+
+			 addOffset(stable, globalRecordDefList);
+
+
+			
+			//printSymbolTable(symbolTable stable, char* fname){
+		//	printRecordDefList(head);
+
+//			addListOffset(stable[0]->inputpars, globalRecordDefList);
+			printSymbolTable(stable);
+
+
+
 			break;
 			
 		default:

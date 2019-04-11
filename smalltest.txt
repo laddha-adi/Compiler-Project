@@ -1,21 +1,27 @@
-_sumN  input parameter list [int d5cc34]  
+_sumN  input parameter list [int d5cc34, int b3 ,record #marks d4]  
 output parameter list[real d3];
 	record #marks
 		type real : maths; 
 		type real: physics; 
 		type real: chemistry;
 	endrecord;
+	type record #marksofsahil : b5c6;
+	type record #marksofsahil : b5c6:global;
+	type int :b4;
+	type int :b3;
+		type record #marksofsahil : b5c7;
 	return [d3];
 end
 
 _main
-
 	record #marksofsahil
 		type real : maths; 
 		type real: physics; 
 		type real: chemistry;
 	endrecord;
-
-	type int :b3 :global;
+	type record #marksofsahil : b5c6;
+	type record #marksofsahil : b5c6:global;
+	type int :b3;
+	type int :b3;
 	return;
 end

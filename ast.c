@@ -117,6 +117,7 @@ treenode createAST(treenode parseTree){
 			// case 53://ne
 			case 22://int
 			case 23://real
+			case 8: //record_id
 			case  1://===
 			case 28://endwhile
 			case 149://moreids
@@ -216,8 +217,13 @@ treenode createAST(treenode parseTree){
 					copynode(currentnode,temp);
 					parent=currentnode->parent;
 					child=currentnode->children;
+					
 					parent->children=child;
-					child->parent=parent;
+					
+					while(child!=NULL){
+						child->parent=parent;
+						child=child->next;
+					}
 					temp=currentnode->children;
 					free(currentnode);
 					createAST(temp);
