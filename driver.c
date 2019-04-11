@@ -213,7 +213,7 @@ printf("\n====================================\n");
 
 			 addOffset(stable, globalRecordDefList);
 
-
+			 //printf("$$$%d\n", head->width);
 			
 			//printSymbolTable(symbolTable stable, char* fname){
 		//	printRecordDefList(head);

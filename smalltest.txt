@@ -5,23 +5,12 @@ output parameter list[real d3];
 		type real: physics; 
 		type real: chemistry;
 	endrecord;
-	type record #marksofsahil : b5c6;
-	type record #marksofsahil : b5c6:global;
+	type record #marks : b5c6;
 	type int :b4;
-	type int :b3;
-		type record #marksofsahil : b5c7;
 	return [d3];
 end
 
 _main
-	record #marksofsahil
-		type real : maths; 
-		type real: physics; 
-		type real: chemistry;
-	endrecord;
-	type record #marksofsahil : b5c6;
-	type record #marksofsahil : b5c6:global;
-	type int :b3;
 	type int :b3;
 	return;
 end
