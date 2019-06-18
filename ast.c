@@ -1,26 +1,36 @@
+/*
+GROUP NUMBER: 11
+NIKKI GUPTA 2016A7PS0057P
+SAHIL RANADIVE 2016A7PS0097P
+ADITI AGARWAL 2016A7PS0095P
+ADITYA LADDHA 2016A7PS0038P
+*/
+
+
 #include "ast.h"
 #include "lexer.h"
 #include "parser.h"
 
 void copynode(treenode currentnode,treenode temp){
+	if(currentnode==NULL||temp==NULL)printf("Null nodes here..\n");
 	temp->id = currentnode->id;
 	temp->line=currentnode->line;
 	strcpy(temp->lexeme, currentnode->lexeme);
 }
 
 treenode createAST(treenode parseTree){
-	// printf("new parse tree node\n");
 	treenode currentnode = parseTree;
-	treenode temp,sibling,child,parent;
-	// printf("entered function\n");
+	treenode temp=NULL;
+	treenode sibling = NULL;
+	treenode child=NULL;
+	treenode parent=NULL;
 	if(currentnode==NULL){
 		printf("Empty node. How?\n" );
 	}
 
-	printf("AST for idno %d and lexeme %s \n",currentnode->id,getCorrespondingString(currentnode->id));
 
 	if(currentnode->children==NULL && currentnode->next==NULL){
-		printf("cond1\n");
+		//printf("cond1\n");
 		switch(currentnode->id){
 			case 4://id
 					temp = currentnode;
@@ -55,30 +65,47 @@ treenode createAST(treenode parseTree){
 					break;
 
 			case 134: //exprime
-					// if(currentnode->parent->id==133){
-					// 	child=currentnode->parent->children;
-					// 	printf("Here lies %d\n", child->id);
-					// 	child->next=NULL;
-					// 	// free(currentnode);
-					// 	break;
-					// }
-					if(currentnode->parent->id==133){
-						break;
-					}
+					
+					if(currentnode->parent->id==133){   //first exprime of the arithmetic tree just collapse exprime
+						temp=currentnode->parent->parent;//assignstmt
+						//printf("id of temp is %d\n",temp->id);
+						parent=currentnode->parent;//arthexp
+						child=temp->children;
+						//printf("id of child is %d\n",child->id);
+						if(child->id==133)//arthexp has been called by term
+						{
+							temp->children=parent->children;
+							temp->children->parent=temp;
+							temp->children->next=parent->next;
+							free(parent);
 
+						}
+						else{//arthexp has been called by assignstmt
+
+							while(child->next->id!=133){
+							child=child->next;
+							}
+							child->next=parent->children;
+							parent->children->next=NULL;
+							//printf("id of temp is %d\n",temp->id);
+							parent->children->parent=temp;
+							
+							free(parent);
+						}
+						
+						// free(currentnode);
+					}
+					else{ // exprime being collapsed is not the first exprime
 					parent= currentnode->parent->parent;
 					temp=currentnode->parent;
 					child= parent->children;
-					printf("befor whule\n");
-					printf("parent of termprime is %d\n", child->id);
+					//printf("parent of termprime is %d\n", child->id);
 					// printTree(parent);
 
 					while(child->next->id!= 37&&child->next->id!= 38)
 					{
 						child=child->next;
-						printf("inside while1222\n");
 					}
-					printf("before while2\n");
 					child->next= temp->children;
 
 					while(child->next->next!=NULL)
@@ -87,11 +114,12 @@ treenode createAST(treenode parseTree){
 						child->parent = parent;
 						child=child->next;
 					}
-					printf("afte while2\n");
 					child->parent=parent;
 					child->next=NULL;
-					free(currentnode);
+					
 					free(temp);
+					// free(currentnode);
+					}
 					break;
 
 			case 136://termprime
@@ -99,29 +127,26 @@ treenode createAST(treenode parseTree){
 					parent= currentnode->parent->parent;
 					temp=currentnode->parent;
 					child= parent->children;
-					printf("befor whule\n");
-					printf("parnet of termprime is %d\n", child->id);
+					//printf("befor whule\n");
 					// printTree(parent);
-					if(child->id==135&&temp->next==NULL&&parent->id==133){
-						parent=parent->parent;
-						child=temp->children;
-						parent->children=child;
-						child->parent=parent;
-						child->next=NULL;
+					if(child->id==123&&temp->next==NULL&&parent->id==122){//b<---3;
+						child->next=temp->children;
+						temp->children->next=NULL;
+						temp->children->parent=parent;
+						free(temp);
+						// free(currentnode);
+
 
 
 
 					}
-					else if(child->id==135&&temp->next!=NULL){
+					else if(child->id==135&&temp->next!=NULL){//b<--4+6
 
-						printf("1\n");
-						parent->children=temp->children;
-						printf("1\n");
-						parent->children->next=temp->next;
-						printf("1\n");
-						parent->children->parent=parent;
-						printf("1\n");
-						// free(currentnode);
+					parent->children=temp->children;
+					parent->children->next=temp->next;
+					parent->children->parent=parent;
+					free(temp);
+					// free(currentnode);
 						
 					}
 					else if(child->id==135&&temp->next==NULL){
@@ -131,7 +156,7 @@ treenode createAST(treenode parseTree){
 						child->parent=parent;
 						child->next=NULL;
 						free(temp);
-						free(currentnode);
+						// free(currentnode);
 						break;
 
 
@@ -141,9 +166,7 @@ treenode createAST(treenode parseTree){
 						while(child->next->id!= 39 && child->next->id!= 40&&child->next->id!= 37&&child->next->id!= 38)
 					{
 						child=child->next;
-						printf("inside while1222\n");
 					}
-					printf("before while2\n");
 					child->next= currentnode->parent->children;
 
 					while(child->next->next!=NULL)
@@ -152,32 +175,16 @@ treenode createAST(treenode parseTree){
 						child->parent = parent;
 						child=child->next;
 					}
-					printf("afte while2\n");
 					child->parent=parent;
 					child->next=NULL;
-					free(currentnode);
+					
 					free(temp);
+					// free(currentnode);
 					}
 					
 					
 					
 					break;
-			// case 37://+
-			// case 38://-
-			// 		temp = currentnode;
-			// 		while(temp->id != 134){//exprime
-			// 			temp = temp->parent;
-			// 		}
-			// 		copynode(currentnode,temp);
-			// 		break;
-			// case 39://*
-			// case 40:///
-			// 		temp = currentnode;
-			// 		while(temp->id != 135){//termprime
-			// 			temp = temp->parent;
-			// 		}
-			// 		copynode(currentnode,temp);
-			// 		break;
 			case 45://and
 			case 46://or
 			case 48://lt
@@ -200,7 +207,7 @@ treenode createAST(treenode parseTree){
 
 					sibling=child->next->next;
 					child->next=sibling;
-					free(currentnode);
+					// free(currentnode);
 					free(parent);
 					break;
 		}
@@ -218,12 +225,6 @@ treenode createAST(treenode parseTree){
 			case 40:// div
 			case 45:// and
 			case 46:// or
-			// case 48://lt
-			// case 49://le
-			// case 50://eq
-			// case 51://gt
-			// case 52://ge
-			// case 53://ne
 			case 22://int
 			case 23://real
 			case 8://recordid
@@ -244,6 +245,7 @@ treenode createAST(treenode parseTree){
 			case 105://outputpar
 			case 102://otherfuncs
 			case 151://allnew
+			case 124://new_24
 					parent = currentnode->parent;  //make the current node NULL
 					if(parent->children->next == NULL)//current node is only child
 						parent->children = NULL;
@@ -257,14 +259,12 @@ treenode createAST(treenode parseTree){
 						// printf("deleting the node\n");
 						child->next = NULL;
 					}
-					// printf("deleting the node\n");
 					free(currentnode);
-					// printf("deleting the node\n");
 		}
 
 	}
 	else if(currentnode->children!=NULL && currentnode->next==NULL){
-			printf("cond2\n");
+			//printf("cond2\n");
 
 			// if(currentnode->parent!=NULL)
 			// printf("%d\n",currentnode->parent->id );
@@ -343,17 +343,7 @@ treenode createAST(treenode parseTree){
 
 			case 144://logicalop
 			case 145://relationalop
-					// temp = currentnode;
-
-					// while(temp->id != 142){//copy to boolexp
-					// 	temp = temp->parent;
-					// }
-					// copynode(currentnode,temp);
-					// parent=currentnode->parent;
-					// child=currentnode->children;
-					// parent->children=child;
-					// child->parent=parent;
-					// free(currentnode);
+				
 					createAST(currentnode->children);
 					break;
 			case 124://new24   : collapse
@@ -403,7 +393,7 @@ treenode createAST(treenode parseTree){
 					}
 					free(currentnode);
 					//child = parent->children;
-					printf("%d\n",child->next->id );
+					//printf("%d\n",child->next->id );
 					createAST(child->next);
 					break;
 
@@ -438,7 +428,7 @@ treenode createAST(treenode parseTree){
 		}
 	}
 	else if(currentnode->children==NULL && currentnode->next!=NULL){
-		printf("cond3\n");
+		//printf("cond3\n");
 		switch(currentnode->id){
 			case 20://input h
 			case 16://parameter h
@@ -469,7 +459,7 @@ treenode createAST(treenode parseTree){
 					temp=currentnode->next;
 
 					child=parent->children;
-					printf("%d\n",child->next->id);
+					//printf("%d\n",child->next->id);
 					if(child->id==currentnode->id){ //if its the first child of parent
 						// printf("first child\n");
 						parent->children=currentnode->next;
@@ -481,32 +471,28 @@ treenode createAST(treenode parseTree){
 					else{
 						while(child->next->id!=currentnode->id){
 							child=child->next;
-							printf("%d\n",child->next->id);
+							//printf("%d\n",child->next->id);
 						}
 						child->next=currentnode->next;
 					}
 
 					free(currentnode);
-					// printf("okay\n");
 
 					createAST(child->next);
 					break;
 			case 7://funid copy
-					/*temp=currentnode->next;
-					parent=currentnode->parent;
-					if(parent->id==104){//function
-						copynode(currentnode,parent);
-						parent->children=temp;
-						free(currentnode);
-					}
-
-					createAST(temp);
-					break;*/
-				currentnode ->parent ->parent->children = currentnode;
-				temp = currentnode->parent;
-				currentnode->parent = currentnode ->parent ->parent;
-				free(temp);
-				createAST(currentnode->next);
+				if(currentnode->parent->id==125){
+					createAST(currentnode->next);
+				}
+				else{
+					currentnode ->parent ->parent->children = currentnode;
+					temp = currentnode->parent;
+					currentnode->parent = currentnode ->parent ->parent;
+					free(temp);
+					createAST(currentnode->next);
+				}
+				
+				
 				break;
 
 			case 34://read copy to iostmt
@@ -554,7 +540,7 @@ treenode createAST(treenode parseTree){
 
 	}
 	else if(currentnode->children!=NULL && currentnode->next!=NULL){
-		printf("cond4\n");
+		//printf("cond4\n");
 		switch(currentnode->id){
 			case 102://otherfunc
 			case 111://stmts
@@ -589,7 +575,6 @@ treenode createAST(treenode parseTree){
 					createAST(currentnode->children);
 					break;
 			case 121://stmt
-					// printf("stmt ka bacha%d %s\n",currentnode->children->id,currentnode->children->lexeme);
 
 					createAST(currentnode->next);
 					createAST(currentnode->children);
@@ -612,18 +597,18 @@ treenode createAST(treenode parseTree){
 					break;
 
 			case 137://factor
-							parent=currentnode->parent;
-							child=currentnode->children;
-							parent->children=child;
-							while(child->next!=NULL){
-								child->parent=parent;
-								child=child->next;
-							}
+						parent=currentnode->parent;
+						child=currentnode->children;
+						parent->children=child;
+						while(child->next!=NULL){
 							child->parent=parent;
-							child->next=currentnode->next;
-							free(currentnode);
-							createAST(parent->children);
-							break;
+							child=child->next;
+						}
+						child->parent=parent;
+						child->next=currentnode->next;
+						free(currentnode);
+						createAST(parent->children);
+						break;
 				case 140: //all
 					 createAST(currentnode->next);
 					 createAST(currentnode->children);
@@ -632,7 +617,7 @@ treenode createAST(treenode parseTree){
 				case 139: //highPrecedenceOperators
 						copynode(currentnode->children, currentnode->parent);
 					  	copynode(currentnode->children, currentnode->parent->parent);
-						free(currentnode->children);
+						// free(currentnode->children);
 						parent= currentnode->parent;
 						currentnode->parent->children= currentnode->next;
 						free(currentnode);
@@ -640,6 +625,10 @@ treenode createAST(treenode parseTree){
 						break;
 
 			case 120://otherstmts
+					if(currentnode->next->id!=146){
+
+					
+
 
 					parent=currentnode->parent;
 					child=parent->children;
@@ -659,6 +648,11 @@ treenode createAST(treenode parseTree){
 
 					free(currentnode);
 					createAST(sibling->next);
+					}
+					else{
+						createAST(currentnode->next);
+						createAST(currentnode->children);
+					}
 					break;
 
 			case 143://var
@@ -689,129 +683,4 @@ treenode createAST(treenode parseTree){
 	return(parseTree);
 }
 
-/*
-treenode runLexerAndParser(FILE* fp, node* gRules, hashtable ht, parseTable pTable){
 
-    if(ht==NULL) ht=createHashTable();
-
-    if(gRules==NULL)  gRules = readGrammar("Grammar.txt",ht);
-
-    int	error=0;
- 	int bsize=300;
-	char *buffer=(char*)malloc(bsize*sizeof(char));
-   	tokenInfo t;
-   	t=getNextToken(fp,buffer,bsize);
-   	treenode w = parseInputSourceCode(fp, pTable,gRules,t,buffer, bsize,ht,&error);
-   	if(error==0){
-   		printf("Input Source Code is syntactically correct....\n");
-   	}
-
-   	rewind(fp);
-   	// printf("before rewind\n");
-   	// rewind(parseTreeOutputFile);
-   	lineNo=1;
-   	return w;
-   //printTree(w);
-}
-	/*
-	int main (int argc, char* argv[]){
-	int input;
-	lineNo=1;
-	char inputFileName[50], outputFileName[50];
-	FILE* fp ;
-		FILE* parseTreeOutputFile ;
-		FILE* cleanfile ;
-
-	// if(argc != 3)
-	// {
-	// 	printf("Incorrect number of arguments passed. Exiting with return value 1\n");
-	// 	return 1;
-	// }
-	// else
-	// {
-		// strcpy(inputFileName,argv[1]);
-		// strcpy(outputFileName, argv[2]);
-
-		fp = fopen("test.txt", "r");
-		// parseTreeOutputFile = fopen(argv[2], "w");
-		cleanfile = fopen("cleanfile.txt", "w");
-	// }
-	hashtable ht = createHashTable();
-	node* gRules = readGrammar("Grammar.txt", ht);
-	// printf("Grammar Created!\n");
-
-
-    getFirst(ht,"First.txt");
-    getFollow(ht,"Follow.txt");
-
-    parseTable pt = createParseTable(ht,gRules);
-    // printf("ParseTable Created");
-	// printIntro();
-
-	// char str[20];
-	// while(1){
-	// 	printOptions();
-	// scanf("%s", str);
-
-	// input = (int)str[0]-'0';
-
-	// if(input>=0 && input<=4){
-	// switch (input){
-	// 	case 0:
-	// 		exit(0);
-	// 		break;
-
-	// 	case 1:
-	// 		printf("Removing Comments...\n");
-	// 		printRemoveComments(fp, cleanfile);
-	// 		break;
-
-	// 	case 2:
-	// 		printf("Printing token list...\n");
-	// 		printTokenList(fp);
-	// 		break;
-
-		// case 3:
-			// printf("Parsing...\n");
-			if(fp==NULL) printf("file pointer error");
-			treenode tree = runLexerAndParser(fp, gRules, ht,pt);
-			// printInorderTraversal(tree, parseTreeOutputFile);
-			// fprintf(parseTreeOutputFile,"%15s %6s %19s %15s %25s %8s %18s\n", "lexeme", "Line", "Token","Value","Parent","isLeaf","Node Symbol" );
-
-			// printParseTree(tree, parseTreeOutputFile);
-			 printf("start AST\n");
-			tree=createAST(tree);
-			printTree(tree);
-			// break;
-
-	// 	case 4:
-	// 	;
- //            clock_t start_time=0, end_time=0;
- //            double total_CPU_time, total_CPU_time_in_seconds;
- //            start_time = clock();
- //                                                // invoke your lexer and parser here
-	// 		printf("Printing total time taken...\n");
-
-	// 		runLexerAndParser(fp, parseTreeOutputFile, gRules, ht,pt);
-
- //            end_time = clock();
- //            total_CPU_time  =  (double) (end_time - start_time);
- //            total_CPU_time_in_seconds =   total_CPU_time / CLOCKS_PER_SEC;
- //            printf("Total CPU time = %f \nTotal CPU time in seconds %f\n",total_CPU_time, total_CPU_time_in_seconds);
-	// 		break;
-
-	// 	default:
-	// 		printf("Invalid input\n");
-	// 		break;
-	// }
-	// }
-	// else
-	// {
-	// 	printf("Invalid input\n");
-	// }
-	// }
-	fclose(fp);
-	// fclose(parseTreeOutputFile);
-	fclose(cleanfile);
-	return 0;
-}*/

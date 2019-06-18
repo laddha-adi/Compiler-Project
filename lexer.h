@@ -22,6 +22,7 @@ void createLexerHashTable();
 long long hashFunc(char* string);
 int lookup(char* lexeme);
 
-void removeComments(FILE* testfile,FILE* cleanfile);
-
+void removeComments(FILE* testfile);
+int getLexerErrors();
+void resetLexError();
 #endif

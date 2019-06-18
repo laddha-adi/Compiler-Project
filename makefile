@@ -7,5 +7,5 @@
 
 CC=gcc
 
-stage1exe: driver.c parser.c lexer.c 
-	gcc -o stage1exe -g driver.c parser.c lexer.c 
+compiler: driver.c parser.c lexer.c ast.c symboltable.c typechecker.c semanticanalyzer.c codegen.c
+	gcc -o compiler -g driver.c parser.c lexer.c ast.c symboltable.c typechecker.c semanticanalyzer.c codegen.c

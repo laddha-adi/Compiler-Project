@@ -14,6 +14,21 @@ int hash_size = 10000;
 #define PTcols 55
 #define Ngrammar 94
 
+int P_TREE_SIZE = 0;
+int parser_error = 0;
+
+int getPTreeSize(){
+  return P_TREE_SIZE;
+}
+
+int getParsingErrors(){
+  return parser_error;
+}
+
+void resetParserError(){
+  parser_error = 0;
+}
+
 int hashcode(char* string){
   const int p=31;
   const int m=hash_size;
@@ -25,6 +40,7 @@ int hashcode(char* string){
   }
   return hashValue%m;
 }
+
 
 hashtable createHashTable(){
     hashtable ht = (hashtable)malloc(sizeof( helement)*(hash_size+1));
@@ -619,6 +635,7 @@ treenode createTreeNode(char *a, int Id, char* lexeme){
     newNode -> lexeme = (char*) malloc(sizeof(char)*30);
 
     newNode -> id = Id;
+    P_TREE_SIZE += sizeof(struct TreeNode);
     return newNode;
 }
 
@@ -740,7 +757,7 @@ treenode parseInputSourceCode(FILE* fp, parseTable pTable, node* gRules, tokenIn
             t_ptr = t_ptr -> next;
             *error=1;
             printf("Line No:%d The token %s for lexeme %s  does not match with the expected token %s\n", token.line, getCorrespondingString(ip), token.value,getCorrespondingString(X));
-          
+            parser_error++;
 
           }
         else if(pTable[X%100][ip] == -1){
@@ -763,7 +780,7 @@ treenode parseInputSourceCode(FILE* fp, parseTable pTable, node* gRules, tokenIn
 
           }   *error=1;
               printf("Line No: %d Error: Invalid token %s encountered with value %s stack top %s\n",token.line, getCorrespondingString(ip), token.value, getCorrespondingString(X));
-         
+              parser_error++;
         }
         else if(pTable[X%100][ip] == -2){
             //Sync
@@ -778,7 +795,7 @@ treenode parseInputSourceCode(FILE* fp, parseTable pTable, node* gRules, tokenIn
             t_ptr = t_ptr -> next;
               *error=1;
               printf("Line No: %d Error: Invalid token %s encountered with value %s stack top %s\n",token.line, getCorrespondingString(ip), token.value, getCorrespondingString(X));
-                     
+              parser_error++;
 
 
         }
@@ -836,7 +853,7 @@ treenode parseInputSourceCode(FILE* fp, parseTable pTable, node* gRules, tokenIn
     return t_head;
 }
 
-void printParseTree(treenode pTree, FILE* fp)
+void printParseTree(treenode pTree)
 {
   /*char term[15];
   char lexemeCurrentNode[20];
@@ -848,7 +865,7 @@ void printParseTree(treenode pTree, FILE* fp)
   char isLeaf[4];*/
 
   if(pTree != NULL){
-    printParseTree(pTree->children, fp);
+    printParseTree(pTree->children);
     //strcpy(term ,getCorrespondingString(pTree->id));
     
     char value[40]="N/A";
@@ -856,15 +873,15 @@ void printParseTree(treenode pTree, FILE* fp)
       if(pTree->id==6||pTree->id==5)
           strcpy(value,pTree->lexeme);
               // fprintf(fp,"LEXEME:%s\tLINE NO:%d\tTOKEN:%s\tVALUE:%s\tPARENT NODE:%s\tISLEAF():%s\tNODE SYMBOL:%s\n", pTree->lexeme, pTree->line, getCorrespondingString(pTree->id),value,getCorrespondingString(pTree->parent->id),"yes","\t" );      
-          fprintf(fp,"%15s %6d %19s %15s %25s %8s %18s\n", pTree->lexeme, pTree->line, getCorrespondingString(pTree->id),value,getCorrespondingString(pTree->parent->id),"yes","\t" );      
+          printf("%15s %6d %19s %15s %25s %8s %18s\n", pTree->lexeme, pTree->line, getCorrespondingString(pTree->id),value,getCorrespondingString(pTree->parent->id),"yes","\t" );      
 
     
     } 
     else {
       if(pTree!=NULL && pTree->id==100)
-        fprintf(fp,"%15s %6d %19s %15s %25s %8s %18s\n", "----", pTree->line, "\t",value,"ROOT","no",getCorrespondingString(pTree->id) );
+        printf("%15s %6d %19s %15s %25s %8s %18s\n", "----", pTree->line, "\t",value,"ROOT","no",getCorrespondingString(pTree->id) );
       else
-        fprintf(fp,"%15s %6d %19s %15s %25s %8s %18s\n", "----", pTree->line, "\t",value,getCorrespondingString(pTree->parent->id),"no",getCorrespondingString(pTree->id) );
+        printf("%15s %6d %19s %15s %25s %8s %18s\n", "----", pTree->line, "\t",value,getCorrespondingString(pTree->parent->id),"no",getCorrespondingString(pTree->id) );
     }
 
 
@@ -877,7 +894,7 @@ void printParseTree(treenode pTree, FILE* fp)
         treenode temp = pTree->children->next;
         while(temp != NULL)
         {
-          printParseTree(temp, fp);
+          printParseTree(temp);
           temp = temp->next;
         } 
       }
@@ -951,5 +968,16 @@ void inorder(treenode tree,FILE* fp){
   fclose(fp);
 }
 
+int nodenum = 0;
 
-
+int countNodes(treenode tree){
+  if(tree == NULL) return 0;
+  int i = 0;
+  if(tree->children==NULL) return 1;
+  treenode temp = tree->children;
+  while(temp!=NULL){
+    i+=countNodes(temp);
+    temp = temp->next;
+  }
+  return i+1;
+}

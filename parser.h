@@ -46,7 +46,11 @@ treenode  addChildrenRule(treenode parent, node gListHead, int line, char* lexem
 int getId(char* str);
 void printInorderTraversal(treenode tree,char* outputFileName);
 void inorder(treenode tree,FILE* fp);
-void printParseTree(treenode pTree, FILE* fp);
+void printParseTree(treenode pTree);
 void printTree(treenode t);
+int getPTreeSize();
+int getParsingErrors();
+void resetParserError();
+int countNodes(treenode root);
 
 #endif

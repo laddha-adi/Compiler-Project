@@ -1,125 +1,16 @@
+/*
+GROUP NUMBER: 11
+NIKKI GUPTA 2016A7PS0057P
+SAHIL RANADIVE 2016A7PS0097P
+ADITI AGARWAL 2016A7PS0095P
+ADITYA LADDHA 2016A7PS0038P
+*/
+
+
+
 #include "symboltable.h"
 
 int offset = 0;
-int size = 10000;
-
-symbolTable create(){
-	symbolTable st = (symbolTable)malloc(sizeof(struct symbolTable*)*size);
-	int i = 0;
-	while(i<size){
-		st[i]=NULL;
-		i++;
-	}
-	return st;
-}
-
-/*recordTable createRT(){
-	recordTable st = (recordTable)malloc(sizeof(record)*size);
-	int i = 0;
-	while(i<size){
-		st[i]=NULL;
-		i++;
-	}
-	return st;
-}
-*/
-/*recordTable insertToRT(recordTable rt, treenode){
-
-}
-*/
-int hash(char *str){
-	unsigned long int hashvalue = 6669;
-	int i = 0;
-	while(hashvalue < ULONG_MAX && i < strlen(str)){
-		hashvalue  =  str[i] + 71 * hashvalue;
-		i++;
-	}
-	return hashvalue % size;
-}
-
-symbolTable insert(char* scope, variable var, int typelist, symbolTable stable){//typelist = 0,1,2:input,output,local{}
-	//char* scope = (char*)maloc(sizeof(char)*50);
-	int index = hash(scope);
-	if(	stable[index]==NULL){
-
-		stable[index] = (struct symbolTable*)malloc(sizeof(struct symbolTable));
-		stable[index]->scope = (char*)malloc(sizeof(char)*50);
-		strcpy(stable[index]->scope,scope);
-	}
-	else{ //check if function already present in stable
-		struct symbolTable* t = stable[index];
-		int flag=0;
-		while(t!=NULL){
-			if(!strcmp(t->scope,scope)){//scope already present
-				if(typelist==0){
-					stable[index]->inputpars= insertAtEnd(stable[index]->inputpars,var);
-				}
-				else if(typelist==1){
-					stable[index]->outputpars= insertAtEnd(stable[index]->outputpars,var);
-				}
-				else {
-					stable[index]->localvars= insertAtEnd(stable[index]->localvars,var);
-				}
-				flag=1;
-				return stable;
-
-			}
-			else
-				t=t->next;
-		
-		}
-		if(!flag){
-			while(t->next!=NULL)
-				t=t->next;
-			t->next=(struct symbolTable*)malloc(sizeof(struct symbolTable));
-			t->next->scope = (char*)malloc(sizeof(char)*50);
-			strcpy(t->next->scope,scope);
-
-		}
-	}
-
-	if(typelist==0){
-		stable[index]->inputpars= insertAtEnd(stable[index]->inputpars,var);
-	}
-	else if(typelist==1){
-		stable[index]->outputpars= insertAtEnd(stable[index]->outputpars,var);
-	}
-	else {
-		stable[index]->localvars= insertAtEnd(stable[index]->localvars,var);
-	}
-
-	return stable;
-}
-
-variable lookupSTable(variable var, char*scope, symbolTable stable, variable globalVarList){
-	int index=hash(scope);
-	
-	if(	stable[index]==NULL){
-		return NULL;
-	}
-	int a,b,c,d;
-	int flag = 0;
-	struct symbolTable* t = stable[index];
-	while(t!=NULL){
-		if(strcmp(t->scope,scope)==0){
-			a = searchInList(var,t->inputpars);
-			b = searchInList(var,t->outputpars);
-			c = searchInList(var,t->localvars);
-			
-			break;
-		}
-		t = t->next;
-	}
-	//struct symbolTable* global = stable[hash("global")];
-	//d = searchInList(var,global->localvars); // all vars in global to be stored in localvars
-	d = searchInGlobalList(globalVarList, var->lexeme);
-	if(a||b||c||d==1)
-		return var;
-	else{
-		return NULL;
-	}
-
-}
 
 variable insertAtEnd(variable list,variable var){
 
@@ -145,17 +36,26 @@ int searchInList(variable var, variable list){
 	return 0;
 }
 
+
+variable searchInListStr(variable list, char* lexeme){
+
+	while(list!=NULL){
+		if(strcmp(list->lexeme,lexeme)==0)
+			return list;
+		list = list->next;
+	}
+
+	return NULL;
+}
+
 recordVar findRecord(recordVar list, char* lex){
-//printf("Entry\n");
 	recordVar temp = list;
 	while(temp!=NULL){
 		if(temp->rname !=NULL && lex!=NULL && strcmp(temp->rname,lex)==0) {
-			//printf("Exit\n");
-return temp;}
+			return temp;
+		}
 		temp = temp->next;
 	}
-//printf("Exit\n");
-
 	return NULL;
 }
 
@@ -165,6 +65,7 @@ variable createVar(treenode declaration, char* scope){
 	strcpy(temp->lexeme,declaration ->children -> next-> lexeme);
 	temp->next = NULL;
 	temp->recordName = NULL;
+	
 	//temp->type = (char*)malloc(sizeof(char)*20);
 	if(declaration->children->lexeme[0]=='#'){
 		temp->type = 8;
@@ -181,58 +82,23 @@ variable createVar(treenode declaration, char* scope){
 			temp->width = 2;
 			temp->offset = offset;
 			offset = offset+ temp->width;
+			temp -> recordName = (char*)malloc(sizeof(char)*50); 
+			strcpy(temp->recordName,"int");
 		}else if(temp->type == 23){
 			temp->width = 4;
 			temp->offset = offset;
 			offset = offset+ temp->width;
+			temp -> recordName = (char*)malloc(sizeof(char)*50); 
+			strcpy(temp->recordName,"real");
 		}
 		else{
 
-			/*
-			recordVar this_record_type = findRecord(list,temp->recordName);
-			temp->width = this_record_type->width;
-			temp->offset = offset;
-			offset+=temp->width;*/
 		}
 	temp->lineno = declaration->line;
 	//printf("Creating %s variable of type %d\n", temp->lexeme, temp->type);
 	return temp;
 }
-/*
 
-variable createRecVar(treenode declaration, char* scope, recordVar list){
-	variable temp = (variable)malloc(sizeof(struct variable));
-	temp -> lexeme = (char*)malloc(sizeof(char)*50); 
-	strcpy(temp->lexeme,declaration ->children -> next-> lexeme);
-	temp->next = NULL;
-	//temp->type = (char*)malloc(sizeof(char)*20);
-	temp->type = declaration->children->id;
-	if(temp->type==8){
-		temp -> recordName = (char*)malloc(sizeof(char)*50); 
-		strcpy(temp->recordName,declaration ->children-> lexeme);
-	}
-	temp->scope = (char*)malloc(sizeof(char)*30); 
-	strcpy(temp->scope,scope);
-		if(temp->type == 22) {
-			temp->width = 2;
-			temp->offset = offset;
-			offset = offset+ temp->width;
-		}else if(temp->type == 23){
-			temp->width = 4;
-			temp->offset = offset;
-			offset = offset+ temp->width;
-		}
-		else{
-			recordVar this_record_type = findRecord(list,temp->recordName);
-			temp->width = this_record_type->width;
-			temp->offset = offset;
-			offset+=temp->width;
-		}
-	temp->lineno = declaration->line;
-
-	return temp;
-}
-*/
 
 variable createParVar(treenode type, treenode TK_ID, char* scope, recordVar list){
 	variable temp = (variable)malloc(sizeof(struct variable));
@@ -259,10 +125,20 @@ variable createParVar(treenode type, treenode TK_ID, char* scope, recordVar list
 			offset = offset+ temp->width;
 		}
 		else{
+			//printf("yahan..\n");
 			recordVar this_record_type = findRecord(list,temp->recordName);
-			temp->width = this_record_type->width;
-			temp->offset = offset;
-			offset+=temp->width;
+			//			printf("yahan..2\n");
+
+			if(this_record_type!=NULL){
+			//				printf("yahan..3\n");
+
+				temp->width = this_record_type->width;
+				temp->offset = offset;
+				offset+=temp->width;
+			}else{
+				printf("Line : %d ERROR: Variable %s is not declared\n", temp->lineno ,temp->recordName);
+				return NULL;
+			}
 		}
 	temp->lineno = -1;
 	return temp;
@@ -278,6 +154,7 @@ variable addToGlobalList(variable list, treenode declaration, char* scope ){
 		temp = temp->next;
 	}
 	temp->next = newVar;
+	//newVar->recordName =  
 	return list;
 }
 
@@ -307,12 +184,14 @@ int searchInGlobalList(variable list, char* lex){
 	return 0;
 }
 
-variable findAndInsertGVariables(variable globalVarList, treenode root, recordVar globalRecordDefList){
+variable findAndInsertGVariables( treenode root, recordVar globalRecordDefList){
 	//t : declaration ==>  TK_INT, TK_ID, global_or_not.
 	//OR , 			  ==>  TK_REAL, TK_ID, global_or_not
-
+	variable globalVarList=NULL;
 	treenode functions = root->children;
 	treenode stmt, declarations;
+	stmt = NULL;
+	declarations = NULL;
 
 	while(functions!=NULL){
 		if(functions->children==NULL)
@@ -339,7 +218,7 @@ variable findAndInsertGVariables(variable globalVarList, treenode root, recordVa
 				//Var is of type int or real.
 				if(declaration->children->next->next->children != NULL){ //if child of global_or_not is not NULL
 					if(searchInGlobalList(globalVarList, declaration->children->next->lexeme)==1){
-						printf("ERROR: Global Var %s already declared\n", declaration->children->next->lexeme);
+						printf("Line : %d ERROR: Global Variable %s cannot be declared again.\n", declaration->children->next->line,declaration->children->next->lexeme);
 					}
 					else
 						globalVarList = addToGlobalList(globalVarList, declaration, "global");
@@ -350,13 +229,13 @@ variable findAndInsertGVariables(variable globalVarList, treenode root, recordVa
 				if(searchInRecordList(globalRecordDefList, declaration->children->lexeme)==1){
 					if(declaration->children->next->next->children != NULL){ //if child of global_or_not is not NULL
 						if(searchInGlobalList(globalVarList, declaration->children->next->lexeme)==1){
-							printf("ERROR: Global Var %s already declared\n", declaration->children->next->lexeme);
+							printf("Line : %d ERROR: Global Variable %s cannot be declared again.\n", declaration->children->next->line,declaration->children->next->lexeme);
 						}
 						else
 							globalVarList = addToGlobalList(globalVarList, declaration, "global");
 					}
 				}else{
-					printf("ERROR: Record Definition of type %s not found\n", declaration->children->lexeme);
+					printf("Line : %d ERROR: Record Definition of type %s not found\n", declaration->children->line,declaration->children->lexeme);
 				}
 			}
 			declaration = declaration -> next;
@@ -398,7 +277,7 @@ void findAndInsertGRecVariables(variable globalVarList, treenode root, recordVar
 			
 			if(declaration->children->next->next->children != NULL){ //if child of global_or_not is not NULL
 				if(searchInGlobalList(globalVarList, declaration->children->next->lexeme)==1){
-					printf("ERROR: Global Var %s already declared\n", declaration->children->next->lexeme);
+					printf("Line : %d ERROR: Global Variable %s already declared\n",declaration->children->next->line ,declaration->children->next->lexeme);
 				}
 				else
 					globalVarList = addToGlobalList(globalVarList, declaration, "global");
@@ -450,20 +329,24 @@ recordVar createRecordVar(treenode typeDef){
 }
 
 recordVar addToRecordList(recordVar list, treenode typeDefs){
+
 	treenode typeDef = typeDefs->children;
+	//printTree(typeDefs);
 	recordVar head = list;
 
 	while(typeDef!=NULL){
+		
 		if(searchInRecordList(list, typeDef->children->lexeme)==1){
-			printf("ERROR: Record Def %s already declared\n", typeDef->children->lexeme);
-			return list;
+			printf("Line : %d ERROR: Record Def %s already declared\n", typeDef->children->line ,typeDef->children->lexeme);
+			typeDef = typeDef->next;
+			continue;
 		}
 		else{
 			recordVar newVar = createRecordVar(typeDef);
-			printf("Adding : %s to Record list\n", typeDef->children->lexeme);	
 			recordVar temp = head;
-			if(temp==NULL)
+			if(temp==NULL){
 				head = newVar;
+			}
 			else {
 				while(temp->next!=NULL){
 					temp = temp->next;
@@ -488,15 +371,16 @@ int searchInRecordList(recordVar list, char* lex){
 }
 
 
-recordVar findAndInsertRecordDefs(recordVar globalRecordDefList, treenode root, recordVar head){
+recordVar findAndInsertRecordDefs(treenode root){
 	//t : declaration ==>  TK_INT, TK_ID, global_or_not.
 	//OR , 			  ==>  TK_REAL, TK_ID, global_or_not
-
+	//printf("Entry\n");
+	recordVar head = NULL;
 	treenode functions = root->children;
 	treenode stmt, typeDefs;
 	while(functions!=NULL){
-		if(functions->children==NULL)
-			{functions=functions->next;
+		if(functions->children==NULL){
+				functions=functions->next;
 			continue;}
 		if(functions->next!=NULL){
 			stmt = functions->children->next->next->next;
@@ -505,10 +389,8 @@ recordVar findAndInsertRecordDefs(recordVar globalRecordDefList, treenode root, 
 			stmt = functions->children; 
 		}
 		
-		typeDefs = stmt->children;		
-		globalRecordDefList = addToRecordList(globalRecordDefList,typeDefs);
-		head = globalRecordDefList;
-
+		typeDefs = stmt->children;	
+		head = addToRecordList(head,typeDefs);
 		functions = functions->next;
 	}
 	return head;
@@ -518,7 +400,15 @@ symbolTableElement createFunction(treenode function, symbolTable stable, variabl
 	//printf("Creating Function %s\n", function->children->lexeme);
 	offset = 0;
 	symbolTableElement newFunction = (symbolTableElement) malloc(sizeof(struct symbolTable));
+	if(newFunction==NULL){
+		printf("memory not given...breaking\n");
+		exit(0);
+	}
 	newFunction->scope = (char*) malloc(sizeof(char)*30);
+	if(newFunction->scope==NULL){
+		printf("memory not given...breaking\n");
+		exit(0);
+	}
 	strcpy(newFunction->scope, function->children->lexeme);
 
 	newFunction->inputpars = NULL;
@@ -526,14 +416,17 @@ symbolTableElement createFunction(treenode function, symbolTable stable, variabl
 	//Adding input vars.
 	treenode inputPars = function->children->next;
 	//printTree(inputPars);
+
 	treenode parameterList = inputPars->children;
 	while(parameterList!=NULL){
 		//printf("a\n");
 		if(searchInGlobalList(newFunction->inputpars,parameterList->children->next->lexeme)==0 && searchInGlobalList(globalVarList,parameterList->children->next->lexeme)==0) {
-			variable tempVar;
-			if(parameterList->children->next->next !=NULL)
+			variable tempVar = NULL;
+			if(parameterList->children->next->next !=NULL){
 				//Record variable
+				//if(isValidRecordInstance())
 				tempVar = createParVar(parameterList->children, parameterList->children->next ,newFunction->scope, recordDefList);
+			}
 			else 
 				//INT or REAL Variable
 				tempVar = createParVar(parameterList->children, parameterList->children->next,newFunction->scope, recordDefList);
@@ -541,17 +434,16 @@ symbolTableElement createFunction(treenode function, symbolTable stable, variabl
 			newFunction->inputpars = addToVariableList(newFunction->inputpars,tempVar);
 			//printVarList(newFunction->inputpars);
 		}else{
-			printf("ERROR: Variable %s already declared\n", parameterList->children->next->lexeme);
+			printf("Line : %d ERROR: Variable %s already declared\n", parameterList->children->next->line,parameterList->children->next->lexeme);
 		}
 		parameterList = parameterList->next;	
 	}
-
 
 	newFunction->outputpars = NULL;
 
 	//Adding input vars.
 	treenode outputPars = function->children->next->next;
-	//printTree(inputPars);
+	//printTree(outputPars);
 	parameterList = outputPars->children;
 	while(parameterList!=NULL){
 		if(searchInGlobalList(newFunction->outputpars,parameterList->children->next->lexeme)==0 && searchInGlobalList(newFunction->inputpars,parameterList->children->next->lexeme)==0 && searchInGlobalList(globalVarList,parameterList->children->next->lexeme)==0) {
@@ -565,11 +457,12 @@ symbolTableElement createFunction(treenode function, symbolTable stable, variabl
 
 			newFunction->outputpars = addToVariableList(newFunction->outputpars,tempVar);
 		}else{
-			printf("ERROR: Variable %s already declared\n", parameterList->children->next->lexeme);
+			printf("Line : %d ERROR: Variable %s already declared\n", parameterList->children->next->line ,parameterList->children->next->lexeme);
 		}
 		parameterList = parameterList->next;	
 	}
 
+	newFunction -> localvars = NULL;
 
 	treenode stmt = function->children->next->next->next;
 	treenode declarations = stmt->children->next;
@@ -584,7 +477,7 @@ symbolTableElement createFunction(treenode function, symbolTable stable, variabl
 					|| searchInGlobalList(newFunction->inputpars, declaration->children->next->lexeme)==1 
 					|| searchInGlobalList(newFunction->localvars, declaration->children->next->lexeme)==1  
 					){
-					printf("ERROR: Local Var %s already declared\n", declaration->children->next->lexeme);
+					printf("Line : %d ERROR: Variable %s already declared\n", declaration->children->next->line,declaration->children->next->lexeme);
 				}
 				else{
 					newFunction->localvars = addToGlobalList(newFunction->localvars, declaration, newFunction->scope);
@@ -596,7 +489,6 @@ symbolTableElement createFunction(treenode function, symbolTable stable, variabl
 	}	
 	newFunction->next = NULL;
 	return newFunction;
-
 }
 
 
@@ -605,12 +497,20 @@ symbolTableElement createMainFunction(treenode function, symbolTable stable, var
 	//printf("Creating Function main\n");
 	offset = 0;
 	symbolTableElement newFunction = (symbolTableElement) malloc(sizeof(struct symbolTable));
+	if(newFunction==NULL){
+		printf("memory not given...breaking\n");
+		exit(0);
+	}
 	newFunction->scope = (char*) malloc(sizeof(char)*30);
+	if(newFunction->scope==NULL){
+		printf("memory not given...breaking\n");
+		exit(0);
+	}
 	strcpy(newFunction->scope, "main");
 
 	newFunction->inputpars = NULL;
 	newFunction->outputpars = NULL;
-
+	newFunction->localvars  = NULL;
 	treenode stmt = function->children;
 	treenode declarations = stmt->children->next;
 	treenode declaration = declarations->children;
@@ -623,7 +523,7 @@ symbolTableElement createMainFunction(treenode function, symbolTable stable, var
 					|| searchInGlobalList(newFunction->inputpars, declaration->children->next->lexeme)==1 
 					|| searchInGlobalList(newFunction->localvars, declaration->children->next->lexeme)==1  
 					){
-					printf("ERROR: Local Var %s already declared\n", declaration->children->next->lexeme);
+					printf("Line : %d ERROR: Variable %s already declared\n", declaration->children->next->line,declaration->children->next->lexeme);
 				}
 				else{
 					newFunction->localvars = addToGlobalList(newFunction->localvars, declaration, newFunction->scope);
@@ -658,17 +558,25 @@ symbolTableElement findInSTable(symbolTable stable, char* fname){
 
 
 symbolTable addFunctions(treenode root, variable globalVarList, recordVar recordDefList){
-	symbolTable stable = (symbolTable)malloc(sizeof(struct symbolTable*) * 100);
+	symbolTable stable = (symbolTable)malloc(sizeof(struct symbolTable*) * 20);
+	if(stable==NULL){
+		printf("memory not given...breaking\n");
+		exit(0);
+	}
 
 	treenode function = root->children;
-	while(function->next!=NULL){
-		if(findInSTable(stable, function->children->lexeme)==NULL){
-			symbolTableElement fun = createFunction(function,stable, globalVarList, recordDefList);
-			stable = addInSTable(stable, fun);
-		}else{
-			printf("ERROR: Function with name %s already defined\n", function->children->lexeme);
-		}
+	if(function->children==NULL) {
 		function = function->next;
+	}
+	while(function->next!=NULL){
+ 		if(findInSTable(stable, function->children->lexeme)==NULL){
+ 			symbolTableElement fun = createFunction(function,stable, globalVarList, recordDefList);
+ 			stable = addInSTable(stable, fun);
+		}else{
+
+		printf("Line : %d ERROR: Function with name %s already defined\n", function->children->line,function->children->lexeme);
+		}
+ 		function = function->next;
 	}
 
 	if(findInSTable(stable, "main")==NULL){
@@ -676,58 +584,101 @@ symbolTable addFunctions(treenode root, variable globalVarList, recordVar record
 		stable = addInSTable(stable, fun);
 	}
 	else{
-		printf("ERROR: Function with name %s already defined\n", function->children->lexeme);
+		printf("Line : %d ERROR: Function with name %s already defined\n", function->children->line,function->children->lexeme);
 	}
-
-	return stable;
+ 	return stable;
 }
 
-void printVarList(variable head){
+
+void printVarList(variable head, recordVar list){
 	while(head!=NULL){
-		printf("%s,\t width: %d\t offset: %d\n",head->lexeme, head->width, head->offset);
+		printf("%s\t\t",head->lexeme);
+		
+		if(head->type==22){
+			printf("int\t\t");
+		}else if(head->type==23){
+			printf("real");
+		}
+		else{
+			recordVar temp = findRecord(list, head->recordName);
+			if(temp!=NULL) printRecordDef(temp);
+			else printf("\t\t\t");
+		}
+		if(strcmp(head->scope, "main")==0) printf("_%s\t\t",head->scope);
+		else printf("%s\t\t",head->scope);
+		printf("%d\n",head->offset);
+
 		head = head->next;
 	}
-	printf("\n");
+	//printf("\n");
 }
+
+void printGlobalVarList(variable head){
+	int offset = 0;
+	while(head!=NULL){
+		printf("Variable name: %s\t type: %s\t offset: %d\n",head->lexeme, head->recordName, offset);
+		offset += head->width;
+		head = head->next;
+	}
+	//printf("\n");
+}
+
 
 void printRecordDefList(recordVar head){
 	while(head!=NULL){
 		if(head!=NULL && head->rname !=NULL){
-			printf("%s,",head->rname);
+			printf("%s\t\t",head->rname);
 			recordField temp;
 
 		}
+		recordField tempField = head->head;
+		int offset = 0;
+		while(tempField->next!=NULL){
+			int type = tempField->type;
+			if(type==22)	{printf("int,"); offset+=2;}
+			if(type==23)	{printf("real,"); offset+=4;}
+			tempField = tempField->next;
+		}
+		int type = tempField->type;
+			if(type==22)	{printf("int"); offset+=2;}
+			if(type==23)	{printf("real"); offset+=4;}
 		head = head->next;
+		printf("\t\t%d\n", offset);
 	}
-	printf("\n");
 }
 
-void printSymbolElement(symbolTableElement sElement ){
 
-	printf("=======================================\n");
-	printf("scope = %s\n", sElement->scope); 
-	printf("Input Pars : \n");
-	printVarList(sElement->inputpars);
-	printf("Output Pars : \n");
-	printVarList(sElement->outputpars);
-	printf("Variables : \n");
-	printVarList(sElement->localvars);
-	printf("=======================================\n");
+void printRecordDef(recordVar head){
+	recordField tempField = head->head;
+	while(tempField->next!=NULL){
+		int type = tempField->type;
+		if(type==22)	{printf("int x ");}
+		if(type==23)	{printf("real x ");}
+			tempField = tempField->next;
+	}
+		int type = tempField->type;
+		if(type==22)	{printf("int\t");}
+		if(type==23)	{printf("real\t");}	
 }
 
-void printSymbolTable(symbolTable stable){
+
+void printSymbolElement(symbolTableElement sElement, recordVar list){
+	printVarList(sElement->inputpars,list);
+	printVarList(sElement->outputpars,list);
+	printVarList(sElement->localvars, list);
+}
+
+void printSymbolTable(symbolTable stable, recordVar list){
 	int i=0;
-	printf("Printing Symbol table\n");
+	printf("Lexeme\t\ttype\t\t\tscope\t\toffset\n");
 	for(i=0;i<SNUM; i++){
 		if(stable[i]!=NULL){
-			printSymbolElement(stable[i]);
+			printSymbolElement(stable[i], list);
 		}
 	}
 }
 
 void addListOffset(variable head, recordVar recordDefList){
-	recordDefList = recordDefList->next;
-
 	while(head!=NULL){
 		if(head!=NULL && head->recordName!=NULL && head->type==8){
 			recordVar temp = findRecord(recordDefList,head->recordName);
@@ -752,19 +703,33 @@ void addOffset(symbolTable stable, recordVar recordDefList){
 		if(stable[i]!=NULL){
 			symbolTableElement sElement = stable[i];
 			if(sElement!=NULL){
+			//	printf("1\n");
 			addListOffset(sElement->inputpars, recordDefList);
+			//printf("2\n");
 			addListOffset(sElement->outputpars, recordDefList);
+			//printf("3\n");
 			addListOffset(sElement->localvars, recordDefList);
+
+			sElement->offset = offset;
 		}else printf("here1\n");
 		}else printf("here2\n");
-
+		
 	}
 }
 
+void printFunctionOffset(symbolTable stable){
+	int i=0;
+	for(i=0;i<SNUM; i++){
+		if(stable[i]!=NULL){
+			printf("%s\t\t%d\n", stable[i]->scope, stable[i]->offset);
+		}
+	}
+}
 
-
-
-
+void cleanVars(){
+	SNUM =0;
+	offset = 0;
+}
 
 
 

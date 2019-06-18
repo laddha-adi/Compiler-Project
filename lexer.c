@@ -12,8 +12,10 @@ ADITYA LADDHA 2016A7PS0038P
 #include <stdlib.h>
 #include <string.h>
 
+int lex_error = 0;
+
+
 hashTableEntry** hashTable;
-// int lineNo=1;
 
 FILE *getStream(FILE* fp,char* buffer,int bsize)
 {
@@ -27,6 +29,15 @@ FILE *getStream(FILE* fp,char* buffer,int bsize)
 	return fp;
 
 }
+
+int getLexerErrors(){
+  return lex_error;
+}
+
+void resetLexError(){
+  lex_error = 0;
+}
+
 
 void createLexerHashTable(){
 	const int m=1e2+9;
@@ -46,8 +57,6 @@ void createLexerHashTable(){
 		hashTable[hashFunc(keywords[j])]->tokenId=tokenids[j];
 		//printf("%s %d \n",hashTable[hashFunc(keywords[j])]->keyword,hashTable[hashFunc(keywords[j])]->tokenId);
 	}
-
-	//printf("%s\n",hashTable[hashFunc("with")]->keyword);
 
 }
 
@@ -97,6 +106,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				if(strlen(lexeme)!=0){
 					if(token.tokenId==0){
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error=1;
 						lexicalerror=1;
 						state=1;
@@ -327,6 +337,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					default:
 					lexicalerror = 1;
 						printf("Line No %d : Error: Unknown Symbol <%c>\n",lineNo, buffer[offset]);
+						lex_error++;
 						offset++;
 						error = 1;
 						state=1;
@@ -374,6 +385,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 				else{
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -390,6 +402,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 				else{
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -435,6 +448,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					token.line=lineNo;
 					if(strlen(lexeme)>20){
 						printf("Line No %d: Error: Variable Identifier is longer than the prescribed length of 20 characters.\n", lineNo);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -456,6 +470,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					if(strlen(lexeme)>20){
 						printf("Line No %d: Error :Variable Identifier is longer than the prescribed length of 20 characters.\n", lineNo);
 						error = 1;
+						lex_error++;
 						lexicalerror=1;
 						state=1;
 						break;
@@ -488,6 +503,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 				else{
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -516,6 +532,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					token.line=lineNo;
 					if(strlen(lexeme)>30){
 						printf("Line No %d: Error :Function Identifier is longer than the prescribed length of 30 characters.\n", lineNo);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -537,6 +554,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 					strcpy(token.value,lexeme);
 					if(strlen(lexeme)>30){
 						printf("Line No %d: Error :Function Identifier is longer than the prescribed length of 30 characters.\n", lineNo);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -556,6 +574,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 				else{
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -586,6 +605,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 
 				else{
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -604,6 +624,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 
 				else{
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -619,6 +640,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 
 				else{
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -637,6 +659,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 
 				else{
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 						state=1;
@@ -686,6 +709,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 				else{
 					printf("Line No %d: Error : Unknown Symbol <%c>\n",lineNo, buffer[offset-1]);
+					lex_error++;
 					error = 1;
 					lexicalerror=1;
 				}
@@ -700,6 +724,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 				}
 				else{
 					printf("Line No %d: Error : Unknown Symbol <%c>\n",lineNo, buffer[offset-1]);
+					lex_error++;
 					error = 1;
 					lexicalerror=1;
 				}
@@ -714,6 +739,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 
 				else{
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 				}
@@ -731,6 +757,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 
 				else{
 						printf("Line no: %d : Error: Unknown pattern <%s>\n",lineNo, lexeme);
+						lex_error++;
 						error = 1;
 						lexicalerror=1;
 				}
@@ -750,7 +777,7 @@ tokenInfo getNextToken(FILE *fp, char* buffer,int bsize)
 	
 }
 
-void removeComments(FILE* testfile,FILE* cleanfile){
+void removeComments(FILE* testfile){
 	char c=getc(testfile);
 
 	while(c!=EOF){
@@ -759,85 +786,11 @@ void removeComments(FILE* testfile,FILE* cleanfile){
 				c=getc(testfile);
 			}
 		}
-		printf("%c", c);
-		fputc(c,cleanfile);
+		//printf("%c", c);
+		//fputc(c,cleanfile);
 		c=getc(testfile);
 	}
 	rewind(testfile);
-	rewind(cleanfile);
+	//rewind(cleanfile);
 }
 
-
-
-
-
-
-
-
-				
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		
-
-				
-				
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-					
-					
-
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-				
-			
